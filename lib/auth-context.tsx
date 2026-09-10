@@ -38,16 +38,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function login(email: string, password: string) {
-    const { token, user } = await api.login(email, password);
-    saveToken(token);
-    setTokenState(token);
+    const { access_token, user } = await api.login(email, password);
+    saveToken(access_token);
+    setTokenState(access_token);
     setUser(user);
   }
 
   async function register(name: string, email: string, password: string) {
-    const { token, user } = await api.register(name, email, password);
-    saveToken(token);
-    setTokenState(token);
+    const { access_token, user } = await api.register(name, email, password);
+    saveToken(access_token);
+    setTokenState(access_token);
     setUser(user);
   }
 

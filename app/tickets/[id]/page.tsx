@@ -2,19 +2,18 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
-import type { Ticket, Comment, TicketEvent } from '@/types';
 
 type State =
   | { status: 'loading' }
   | { status: 'not-found' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; ticket: Ticket };
+  | { status: 'ready'; ticket: any };
 
 export default function TicketDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<State>({ status: 'loading' });
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [events, setEvents] = useState<TicketEvent[]>([]);
+  const [comments, setComments] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {
     api
@@ -38,8 +37,8 @@ export default function TicketDetailPage() {
   if (state.status === 'error') return <p className="text-red-600">{state.message}</p>;
 
   const { ticket } = state;
-  const isOverdue =
-    ticket.dueDate && new Date(ticket.dueDate) < new Date() && ticket.status !== 'closed';
+  const dueAt = ticket.due_at;
+  const isOverdue = dueAt && new Date(dueAt) < new Date() && ticket.status !== 'closed';
 
   return (
     <div>
@@ -47,10 +46,10 @@ export default function TicketDetailPage() {
       {isOverdue && <span className="text-red-600 text-sm">Overdue</span>}
       <p className="mt-2">{ticket.body}</p>
       <div className="text-sm text-gray-500 mt-2">
-        {ticket.status} · {ticket.priority} · due {ticket.dueDate ?? '—'}
+        {ticket.status} · {ticket.priority} · due {dueAt ?? '—'}
       </div>
       <div className="mt-2">
-        {ticket.tags.map((t) => (
+        {(ticket.tags || []).map((t: any) => (
           <span key={t.id} className="border px-2 py-0.5 text-xs mr-1">
             {t.name}
           </span>
@@ -62,7 +61,8 @@ export default function TicketDetailPage() {
         {comments.map((c) => (
           <li key={c.id} className="border p-2">
             <div className="text-sm text-gray-500">
-              {c.authorName} · {c.createdAt} {c.internal && <b>(internal)</b>}
+              Author #{c.author_id} · {c.created_at}{' '}
+              {c.is_internal && <b>(internal)</b>}
             </div>
             <p>{c.body}</p>
           </li>
@@ -72,7 +72,10 @@ export default function TicketDetailPage() {
       <h2 className="font-bold mt-6">History</h2>
       <ul className="text-sm text-gray-600 space-y-1">
         {[...events].reverse().map((e) => (
-          <li key={e.id}>{e.description}</li>
+          <li key={e.id}>
+            {e.from_status} → {e.to_status} {e.note ? `(${e.note})` : ''} ·{' '}
+            {e.created_at}
+          </li>
         ))}
       </ul>
     </div>
