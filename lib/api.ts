@@ -29,7 +29,7 @@ async function request<T>(
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+ const res = await fetch(`${BASE_URL}${path}`, { ...options, headers, cache: 'no-store' });
 
   if (res.status === 204) {
     return undefined as T;
@@ -84,7 +84,7 @@ export const api = {
   deleteTicket: (id: string) =>
     request<void>(`/tickets/${id}`, { method: 'DELETE' }),
 
-  assignTicket: (id: string, assigneeId: string) =>
+  assignTicket: (id: string, assigneeId: number) =>
     request<any>(`/tickets/${id}/assign`, {
       method: 'POST',
       body: JSON.stringify({ assigneeId }),
@@ -99,7 +99,7 @@ export const api = {
   addComment: (id: string, body: string, internal: boolean) =>
     request<any>(`/tickets/${id}/comments`, {
       method: 'POST',
-      body: JSON.stringify({ body, internal }),
+      body: JSON.stringify({ body, isInternal: internal }),
     }),
 
   getEvents: (id: string) => request<any[]>(`/tickets/${id}/events`),
@@ -110,7 +110,7 @@ export const api = {
   addTagToTicket: (id: string, tagId: string) =>
     request<any>(`/tickets/${id}/tags`, {
       method: 'POST',
-      body: JSON.stringify({ tagId }),
+      body: JSON.stringify({ tagId: Number(tagId) }),
     }),
   removeTagFromTicket: (id: string, tagId: string) =>
     request<void>(`/tickets/${id}/tags/${tagId}`, { method: 'DELETE' }),
