@@ -25,3 +25,7 @@ Runs 5 component specs with `fetch` mocked — no backend needed.
 - `lib/permissions.ts` — what each role may do, in one place.
 - `lib/transitions.ts` — the ticket status machine, as data.
 - Filters, search, sort, and page all live in the URL query string.
+
+## Status
+
+Days 1–5 complete: auth shell, ticket list with URL-driven filters, ticket detail/create, role-based controls, and 5 passing component specs with CI.
