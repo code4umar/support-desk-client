@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
 import type { Envelope, Ticket } from '@/types';
@@ -11,7 +11,7 @@ type State =
   | { status: 'error'; message: string }
   | { status: 'ready'; data: Envelope<Ticket> };
 
-export default function TicketsPage() {
+function TicketsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [state, setState] = useState<State>({ status: 'loading' });
@@ -85,5 +85,13 @@ export default function TicketsPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function TicketsPage() {
+  return (
+    <Suspense fallback={<p>Loading…</p>}>
+      <TicketsPageInner />
+    </Suspense>
   );
 }
