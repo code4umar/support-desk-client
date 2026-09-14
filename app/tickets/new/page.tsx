@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
+import RequireAuth from '@/components/RequireAuth';
 
-export default function NewTicketPage() {
+function NewTicketForm() {
   const router = useRouter();
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -60,5 +61,13 @@ export default function NewTicketPage() {
         Create
       </button>
     </form>
+  );
+}
+
+export default function NewTicketPage() {
+  return (
+    <RequireAuth>
+      <NewTicketForm />
+    </RequireAuth>
   );
 }
