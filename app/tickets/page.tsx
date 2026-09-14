@@ -5,6 +5,7 @@ import { api, ApiRequestError } from '@/lib/api';
 import type { Envelope, Ticket } from '@/types';
 import TicketFilters from '@/components/TicketFilters';
 import Pager from '@/components/Pager';
+import RequireAuth from '@/components/RequireAuth';
 
 type State =
   | { status: 'loading' }
@@ -90,8 +91,10 @@ function TicketsPageInner() {
 
 export default function TicketsPage() {
   return (
-    <Suspense fallback={<p>Loading…</p>}>
-      <TicketsPageInner />
-    </Suspense>
+    <RequireAuth>
+      <Suspense fallback={<p>Loading…</p>}>
+        <TicketsPageInner />
+      </Suspense>
+    </RequireAuth>
   );
 }

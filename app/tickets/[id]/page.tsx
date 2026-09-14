@@ -6,6 +6,7 @@ import { api, ApiRequestError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { permissions } from '@/lib/permissions';
 import StatusControl from '@/components/StatusControl';
+import RequireAuth from '@/components/RequireAuth';
 import type { TicketStatus } from '@/lib/transitions';
 
 type State =
@@ -14,7 +15,7 @@ type State =
   | { status: 'error'; message: string }
   | { status: 'ready'; ticket: any };
 
-export default function TicketDetailPage() {
+function TicketDetailInner() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
@@ -158,11 +159,12 @@ export default function TicketDetailPage() {
       {isOverdue && <span className="text-red-600 text-sm">Overdue</span>}
       <p className="mt-2">{ticket.body}</p>
       <div className="text-sm text-gray-500 mt-2">
-        {ticket.status} · {ticket.priority} · due {dueAt ?? '—'} · assignee:{' '}
+        {ticket.status} · {ticket.priority} · due {dueAt ?? '—'} · requester:{' '}
+        {ticket.requester ? ticket.requester.full_name : `#${ticket.requester_id}`} · assignee:{' '}
         {ticket.assignee ? ticket.assignee.full_name : 'unassigned'}
       </div>
 
-            <div className="mt-2 flex flex-wrap gap-1">
+      <div className="mt-2 flex flex-wrap gap-1">
         {(ticket.ticketTags || []).map((tt: any) => (
           <span key={tt.tag.id} className="border px-2 py-0.5 text-xs flex items-center gap-1">
             {tt.tag.name}
@@ -273,12 +275,25 @@ export default function TicketDetailPage() {
 
       <h2 className="font-bold mt-6">History</h2>
       <ul className="text-sm text-gray-600 space-y-1">
-        {[...events].reverse().map((e) => (
-          <li key={e.id}>
-            {e.from_status} → {e.to_status} {e.note ? `(${e.note})` : ''} · {e.created_at}
-          </li>
-        ))}
+        {[...events].reverse().map((e) => {
+          const sentence = e.from_status
+            ? `Status changed from ${e.from_status} to ${e.to_status}${e.note ? ` — ${e.note}` : ''}`
+            : e.note || 'Ticket updated';
+          return (
+            <li key={e.id}>
+              {sentence} · {e.created_at}
+            </li>
+          );
+        })}
       </ul>
     </div>
+  );
+}
+
+export default function TicketDetailPage() {
+  return (
+    <RequireAuth>
+      <TicketDetailInner />
+    </RequireAuth>
   );
 }
