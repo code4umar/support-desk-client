@@ -9,7 +9,7 @@ export default function Header() {
 
   return (
     <header className="p-4 border-b flex justify-between items-center">
-      <Link href="/tickets" className="font-bold">Helmly</Link>
+      <Link href="/tickets" className="font-bold">Deskly</Link>
       {user ? (
         <div className="flex items-center gap-3">
           <span>{user.name} · {user.role}</span>

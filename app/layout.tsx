@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Helmly",
+  title: "Deskly",
   description: "Support Desk client",
 };
 
