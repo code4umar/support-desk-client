@@ -1,4 +1,4 @@
-# Support Desk Client
+# Helmly Client
 
 Next.js (App Router) + TypeScript + Tailwind client for the Support Desk API.
 
