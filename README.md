@@ -1,6 +1,9 @@
-# Helmly Client
+# Deskly Client
 
-Next.js (App Router) + TypeScript + Tailwind client for the Support Desk API.
+**Live client:** https://support-desk-client.vercel.app
+**Live API:** https://support-desk-checklist-production.up.railway.app
+
+Next.js (App Router) + TypeScript + Tailwind client for the Deskly (Support Desk) API.
 
 ## Run locally
 
@@ -28,4 +31,4 @@ Runs 5 component specs with `fetch` mocked — no backend needed.
 
 ## Status
 
-Days 1–5 complete: auth shell, ticket list with URL-driven filters, ticket detail/create, role-based controls, and 5 passing component specs with CI.
+Week 12 complete: deployed to Vercel, connected to a Railway-hosted API backed by Neon Postgres. Auth shell, ticket list with URL-driven filters, ticket detail/create, role-based controls, and 5 passing component specs with CI.
