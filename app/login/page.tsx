@@ -33,23 +33,46 @@ export default function LoginPage() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-sm mx-auto flex flex-col gap-3">
-      <h1 className="text-xl font-bold">Sign in</h1>
-      {error && <p className="text-red-600 text-sm">{error}</p>}
-      <input
-        className="border p-2"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        className="border p-2"
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button className="bg-black text-white p-2" type="submit">Sign in</button>
-    </form>
+    <div className="flex min-h-[80vh] items-center justify-center px-4">
+      <form
+        onSubmit={onSubmit}
+        className="animate-fade-slide-up w-full max-w-sm flex flex-col gap-4 rounded-xl border border-white/10 bg-black/40 p-8 shadow-xl backdrop-blur"
+      >
+        <h1 className="text-2xl font-bold text-center">Sign In</h1>
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold tracking-wide text-zinc-400">
+            Email
+          </label>
+          <input
+            className="border border-white/20 bg-transparent rounded-md p-2 outline-none focus:border-white transition-colors"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-semibold tracking-wide text-zinc-400">
+            Password
+          </label>
+          <input
+            className="border border-white/20 bg-transparent rounded-md p-2 outline-none focus:border-white transition-colors"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <button
+          className="mt-2 bg-white text-black font-semibold rounded-md p-2 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          type="submit"
+        >
+          Sign In
+        </button>
+      </form>
+    </div>
   );
 }
