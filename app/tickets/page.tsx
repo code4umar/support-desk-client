@@ -51,7 +51,12 @@ function TicketsPageInner() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-4">Tickets</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-bold">Tickets</h1>
+        <a href="/tickets/new" className="bg-black text-white px-3 py-1.5 rounded text-sm">
+          New ticket
+        </a>
+      </div>
       <TicketFilters onChange={updateParam} />
 
       {state.status === 'loading' && <p>Loading…</p>}
