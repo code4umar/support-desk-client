@@ -65,17 +65,21 @@ function TicketsPageInner() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Tickets</h1>
-          <p className="text-zinc-400 text-sm mt-1">Track and manage support requests</p>
+            <div className="relative rounded-xl border border-teal-500/20 bg-gradient-to-br from-teal-950 via-zinc-900 to-black p-5 mb-6 overflow-hidden">
+        <div className="pointer-events-none absolute -top-10 -right-10 h-48 w-48 rounded-full bg-teal-400/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-indigo-500/15 blur-3xl" />
+        <div className="relative flex items-center justify-between">
+          <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-2">
+            <h1 className="text-2xl font-bold">Tickets</h1>
+            <p className="text-zinc-400 text-sm mt-1">Track and manage support requests</p>
+          </div>
+          <a
+            href="/tickets/new"
+            className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-teal-400 hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          >
+            + New ticket
+          </a>
         </div>
-        <a
-          href="/tickets/new"
-          className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-teal-400 hover:scale-[1.02] active:scale-[0.98]"
-        >
-          + New ticket
-        </a>
       </div>
 
       <TicketFilters onChange={updateParam} />
