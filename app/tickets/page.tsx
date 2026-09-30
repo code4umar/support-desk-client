@@ -12,6 +12,20 @@ type State =
   | { status: 'error'; message: string }
   | { status: 'ready'; data: Envelope<Ticket> };
 
+const priorityStyles: Record<string, string> = {
+  low: 'bg-sky-500/10 text-sky-400 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-400 border-red-500/30',
+};
+
+const statusStyles: Record<string, string> = {
+  open: 'text-teal-400',
+  in_progress: 'text-amber-400',
+  resolved: 'text-green-400',
+  closed: 'text-zinc-500',
+};
+
 function TicketsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -43,42 +57,68 @@ function TicketsPageInner() {
       const params = new URLSearchParams(searchParams.toString());
       if (value) params.set(key, value);
       else params.delete(key);
-      params.delete('page');
+      if (key !== 'page') params.delete('page');
       router.push(`/tickets?${params.toString()}`);
     },
     [searchParams, router]
   );
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold">Tickets</h1>
-        <a href="/tickets/new" className="bg-black text-white px-3 py-1.5 rounded text-sm">
-          New ticket
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Tickets</h1>
+          <p className="text-zinc-400 text-sm mt-1">Track and manage support requests</p>
+        </div>
+        <a
+          href="/tickets/new"
+          className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-teal-400 hover:scale-[1.02] active:scale-[0.98]"
+        >
+          + New ticket
         </a>
       </div>
+
       <TicketFilters onChange={updateParam} />
 
-      {state.status === 'loading' && <p>Loading…</p>}
-      {state.status === 'error' && <p className="text-red-600">{state.message}</p>}
+      {state.status === 'loading' && (
+        <p className="text-zinc-400 text-center py-8">Loading…</p>
+      )}
+      {state.status === 'error' && (
+        <p className="text-red-500 text-center py-8">{state.message}</p>
+      )}
       {state.status === 'ready' && state.data.data.length === 0 && (
-        <p>
-          {queryString
-            ? 'No tickets match this filter.'
-            : 'You have no tickets.'}
+        <p className="text-zinc-400 text-center py-8 border border-white/10 rounded-xl bg-black/20">
+          {queryString ? 'No tickets match this filter.' : 'You have no tickets.'}
         </p>
       )}
       {state.status === 'ready' && state.data.data.length > 0 && (
         <>
-          <ul className="divide-y">
+          <ul className="flex flex-col gap-3">
             {state.data.data.map((t) => (
-              <li key={t.id} className="py-2">
-                <a href={`/tickets/${t.id}`} className="font-medium">
-                  {t.subject}
+              <li key={t.id}>
+                <a
+                  href={`/tickets/${t.id}`}
+                  className="block rounded-xl border border-white/10 bg-black/30 backdrop-blur p-4 transition-all hover:border-teal-400/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-teal-500/10"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">
+                        {t.subject}{' '}
+                        <span className="text-zinc-500 font-normal">#{t.id}</span>
+                      </p>
+                      <p className={`text-sm mt-1 capitalize ${statusStyles[t.status] ?? 'text-zinc-400'}`}>
+                        {t.status.replace('_', ' ')}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border capitalize ${
+                        priorityStyles[t.priority] ?? 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30'
+                      }`}
+                    >
+                      {t.priority}
+                    </span>
+                  </div>
                 </a>
-                <div className="text-sm text-gray-500">
-                  {t.status} · {t.priority}
-                </div>
               </li>
             ))}
           </ul>
@@ -97,7 +137,7 @@ function TicketsPageInner() {
 export default function TicketsPage() {
   return (
     <RequireAuth>
-      <Suspense fallback={<p>Loading…</p>}>
+      <Suspense fallback={<p className="text-zinc-400 text-center py-8">Loading…</p>}>
         <TicketsPageInner />
       </Suspense>
     </RequireAuth>

@@ -12,21 +12,21 @@ export default function Pager({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <div className="flex gap-2 items-center mt-4">
+    <div className="flex gap-3 items-center justify-center mt-6">
       <button
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
-        className="border px-3 py-1 disabled:opacity-40"
+        className="border border-white/20 rounded-md px-4 py-2 text-sm transition-colors hover:border-teal-400 disabled:opacity-30 disabled:hover:border-white/20"
       >
         Previous
       </button>
-      <span>
+      <span className="text-sm text-zinc-400">
         Page {page} of {totalPages}
       </span>
       <button
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
-        className="border px-3 py-1 disabled:opacity-40"
+        className="border border-white/20 rounded-md px-4 py-2 text-sm transition-colors hover:border-teal-400 disabled:opacity-30 disabled:hover:border-white/20"
       >
         Next
       </button>

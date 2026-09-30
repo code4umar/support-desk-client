@@ -1,6 +1,6 @@
 # Deskly Client
 
-**Live client:** https://support-desk-client.vercel.app
+**Live client:** https://trydeskly.vercel.app
 **Live API:** https://support-desk-checklist-production.up.railway.app
 
 Next.js (App Router) + TypeScript + Tailwind client for the Deskly (Support Desk) API.
