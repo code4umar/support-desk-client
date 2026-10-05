@@ -59,7 +59,7 @@ function TicketsPageInner() {
   const { user } = useAuth();
   const { show } = useToast();
   const [state, setState] = useState<State>({ status: 'loading' });
-  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [assigneeInput, setAssigneeInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -113,7 +113,7 @@ function TicketsPageInner() {
     bulkTarget === 'in_progress' &&
     selectedRows.some((t) => requiresNote(t.status as TicketStatus, 'in_progress'));
 
-  function toggle(id: number) {
+  function toggle(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -126,7 +126,7 @@ function TicketsPageInner() {
     setSelected(allSelected ? new Set() : new Set(rows.map((t) => t.id)));
   }
 
-  async function runBulk(label: string, action: (id: number) => Promise<unknown>) {
+  async function runBulk(label: string, action: (id: string) => Promise<unknown>) {
     setBusy(true);
     const ids = Array.from(selected);
     const results = await Promise.allSettled(ids.map((id) => action(id)));
@@ -148,14 +148,14 @@ function TicketsPageInner() {
       show('Enter a numeric user ID');
       return;
     }
-    runBulk('Assigned', (id) => api.assignTicket(String(id), parsed)).then(() =>
+    runBulk('Assigned', (id) => api.assignTicket((id), parsed)).then(() =>
       setAssigneeInput('')
     );
   }
 
   function bulkDelete() {
     if (!confirm(`Delete ${selected.size} ticket(s)? This cannot be undone.`)) return;
-    runBulk('Deleted', (id) => api.deleteTicket(String(id)));
+    runBulk('Deleted', (id) => api.deleteTicket((id)));
   }
 
   async function bulkChangeStatus() {
