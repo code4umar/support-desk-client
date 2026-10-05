@@ -23,6 +23,22 @@ export default function Header() {
 
         {user ? (
           <div className="flex items-center gap-4">
+            {/* NEW: nav links */}
+           <nav className="flex items-center gap-1">
+              <Link
+                href="/tickets"
+                className="text-sm font-medium text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-md hover:bg-white/5"
+              >
+                Tickets
+              </Link>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-md hover:bg-white/5"
+              >
+                Dashboard
+              </Link>
+            </nav>
+
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
               <span className="h-2 w-2 rounded-full bg-teal-400" />
               <span className="text-sm font-medium text-zinc-200">{user.name}</span>

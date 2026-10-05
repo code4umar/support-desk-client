@@ -7,4 +7,6 @@ export const permissions = {
   canWriteInternalComment: (role: Role) => role === 'agent' || role === 'admin',
   canCreateTag: (role: Role) => role === 'admin',
   canDeleteTicket: (role: Role) => role === 'admin',
+  canEditTicket: (role: Role, isRequester: boolean) =>
+    isRequester || role === 'agent' || role === 'admin',
 };

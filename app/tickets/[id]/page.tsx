@@ -1,10 +1,12 @@
 'use client';
+import { useToast } from '@/components/Toast';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { permissions } from '@/lib/permissions';
+import { timeAgo, slaInfo, initials } from '@/lib/time';
 import StatusControl from '@/components/StatusControl';
 import RequireAuth from '@/components/RequireAuth';
 import type { TicketStatus } from '@/lib/transitions';
@@ -36,6 +38,7 @@ function TicketDetailInner() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
+  const { show } = useToast();
   const [state, setState] = useState<State>({ status: 'loading' });
   const [comments, setComments] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
@@ -48,6 +51,11 @@ function TicketDetailInner() {
   const [commentInternal, setCommentInternal] = useState(false);
   const [commentError, setCommentError] = useState('');
   const [actionError, setActionError] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [editSubject, setEditSubject] = useState('');
+  const [editBody, setEditBody] = useState('');
+  const [editError, setEditError] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
 
   function loadAll() {
     api
@@ -80,8 +88,13 @@ function TicketDetailInner() {
 
   const { ticket } = state;
   const dueAt = ticket.due_at;
-  const isOverdue = dueAt && new Date(dueAt) < new Date() && ticket.status !== 'closed';
+  const sla = slaInfo(dueAt, ticket.status);
   const role = user?.role;
+
+  // author id -> naam (sirf requester/assignee ke naam maloom hain)
+  const people: Record<number, string> = {};
+  if (ticket.requester) people[ticket.requester.id ?? ticket.requester_id] = ticket.requester.full_name;
+  if (ticket.assignee) people[ticket.assignee.id ?? ticket.assignee_id] = ticket.assignee.full_name;
 
   async function handleAssign() {
     setAssignError('');
@@ -93,6 +106,7 @@ function TicketDetailInner() {
     try {
       await api.assignTicket(id, parsed);
       setAssigneeIdInput('');
+      show('Ticket assigned');
       loadAll();
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 422) {
@@ -122,6 +136,7 @@ function TicketDetailInner() {
     try {
       await api.addTagToTicket(id, selectedTagId);
       setSelectedTagId('');
+      show('Tag added');
       loadAll();
     } catch {
       setActionError('Could not add tag.');
@@ -147,6 +162,7 @@ function TicketDetailInner() {
       setCommentInternal(false);
       const fresh = await api.getComments(id);
       setComments(fresh);
+      show('Comment posted');
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 403) {
         setCommentError('You cannot post an internal comment.');
@@ -163,6 +179,32 @@ function TicketDetailInner() {
       router.push('/tickets');
     } catch {
       setActionError('Could not delete ticket.');
+    }
+  }
+
+  function startEdit() {
+    setEditSubject(ticket.subject);
+    setEditBody(ticket.body);
+    setEditError('');
+    setEditMode(true);
+  }
+
+  async function saveEdit() {
+    if (!editSubject.trim() || !editBody.trim()) {
+      setEditError('Subject and description are required.');
+      return;
+    }
+    setEditSaving(true);
+    setEditError('');
+    try {
+      await api.updateTicket(id, { subject: editSubject.trim(), body: editBody.trim() });
+      setEditMode(false);
+      show('Ticket updated');
+      loadAll();
+    } catch (err) {
+      setEditError(err instanceof ApiRequestError ? err.message : 'Could not save changes.');
+    } finally {
+      setEditSaving(false);
     }
   }
 
@@ -184,27 +226,75 @@ function TicketDetailInner() {
               >
                 {ticket.priority}
               </span>
-              {isOverdue && (
-                <span className="text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/30">
-                  Overdue
+              {sla && (
+                <span className={`text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border ${sla.cls}`}>
+                  {sla.label}
                 </span>
               )}
             </div>
           </div>
-          {role && permissions.canDeleteTicket(role) && (
-            <button
-              onClick={handleDelete}
-              className="text-red-400 text-sm border border-red-500/30 rounded-md px-3 py-1.5 hover:bg-red-500/10 transition-colors shrink-0"
-            >
-              Delete ticket
-            </button>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {role && permissions.canEditTicket(role, ticket.requester_id === user?.id) && !editMode && (
+              <button
+                onClick={startEdit}
+                className="text-teal-400 text-sm border border-teal-500/30 rounded-md px-3 py-1.5 hover:bg-teal-500/10 transition-colors"
+              >
+                Edit
+              </button>
+            )}
+            {role && permissions.canDeleteTicket(role) && (
+              <button
+                onClick={handleDelete}
+                className="text-red-400 text-sm border border-red-500/30 rounded-md px-3 py-1.5 hover:bg-red-500/10 transition-colors"
+              >
+                Delete ticket
+              </button>
+            )}
+          </div>
         </div>
 
-        <p className="mt-4 text-zinc-200 whitespace-pre-wrap">{ticket.body}</p>
+        {editMode ? (
+          <div className="mt-4 flex flex-col gap-2">
+            {editError && (
+              <p className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded-md py-1.5 px-3">
+                {editError}
+              </p>
+            )}
+            <input
+              className={inputClass}
+              value={editSubject}
+              onChange={(e) => setEditSubject(e.target.value)}
+              placeholder="Subject"
+            />
+            <textarea
+              className={`${inputClass} resize-none`}
+              rows={4}
+              value={editBody}
+              onChange={(e) => setEditBody(e.target.value)}
+              placeholder="Description"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={saveEdit}
+                disabled={editSaving}
+                className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-teal-400 disabled:opacity-50"
+              >
+                {editSaving ? 'Saving…' : 'Save changes'}
+              </button>
+              <button
+                onClick={() => setEditMode(false)}
+                className="text-sm text-zinc-400 hover:text-white px-4 py-2 rounded-md hover:bg-white/5 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-4 text-zinc-200 whitespace-pre-wrap">{ticket.body}</p>
+        )}
 
         <div className="text-sm text-zinc-500 mt-4 pt-4 border-t border-white/10">
-          Due {dueAt ?? '—'} · Requester:{' '}
+          Due {dueAt ? new Date(dueAt).toLocaleString() : '—'} · Requester:{' '}
           {ticket.requester ? ticket.requester.full_name : `#${ticket.requester_id}`} · Assignee:{' '}
           {ticket.assignee ? ticket.assignee.full_name : 'unassigned'}
         </div>
@@ -304,7 +394,10 @@ function TicketDetailInner() {
           <StatusControl
             ticketId={id}
             currentStatus={ticket.status as TicketStatus}
-            onChanged={() => loadAll()}
+            onChanged={() => {
+              loadAll();
+              show('Status updated');
+            }}
           />
         )}
       </div>
@@ -321,10 +414,13 @@ function TicketDetailInner() {
                   : 'border-white/10 bg-white/5'
               }`}
             >
-              <div className="text-xs text-zinc-500 flex items-center gap-2">
-                <span>Author #{c.author_id}</span>
+              <div className="flex items-center gap-2 text-xs text-zinc-500">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-500/20 text-[10px] font-bold text-teal-300">
+                  {initials(people[c.author_id])}
+                </span>
+                <span className="text-zinc-300">{people[c.author_id] ?? `User #${c.author_id}`}</span>
                 <span>·</span>
-                <span>{c.created_at}</span>
+                <span title={c.created_at}>{timeAgo(c.created_at)}</span>
                 {c.is_internal && (
                   <span className="text-amber-400 font-semibold uppercase tracking-wide">
                     Internal
@@ -378,7 +474,7 @@ function TicketDetailInner() {
               : e.note || 'Ticket updated';
             return (
               <li key={e.id} className="text-sm text-zinc-400 border-l-2 border-teal-500/30 pl-3">
-                {sentence} <span className="text-zinc-600">· {e.created_at}</span>
+                {sentence} <span className="text-zinc-600">· {timeAgo(e.created_at)}</span>
               </li>
             );
           })}
