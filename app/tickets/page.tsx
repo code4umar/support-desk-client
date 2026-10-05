@@ -393,8 +393,20 @@ function TicketsPageInner() {
               return (
                 <li key={t.id} className="flex items-stretch gap-3">
                   {bulkEnabled && (
-   
-
+                    <input
+                      type="checkbox"
+                      aria-label={`select ticket ${t.id}`}
+                      className="accent-teal-500 h-4 w-4 self-center shrink-0"
+                      checked={selected.has(t.id)}
+                      onChange={() => toggle(t.id)}
+                    />
+                  )}
+                  <Link
+                    href={`/tickets/${t.id}`}
+                    className={`block flex-1 min-w-0 rounded-xl border bg-black/30 backdrop-blur p-4 transition-all hover:border-teal-400/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-teal-500/10 ${
+                      selected.has(t.id) ? 'border-teal-400/60' : 'border-white/10'
+                    }`}
+                  >
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="font-medium truncate">
