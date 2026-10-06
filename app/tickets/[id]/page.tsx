@@ -40,6 +40,7 @@ function TicketDetailInner() {
   const { user } = useAuth();
   const { show } = useToast();
   const [state, setState] = useState<State>({ status: 'loading' });
+  const [minTimeDone, setMinTimeDone] = useState(false);
   const [comments, setComments] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
   const [allTags, setAllTags] = useState<any[]>([]);
@@ -73,18 +74,44 @@ function TicketDetailInner() {
     api.getComments(id).then(setComments).catch(() => {});
     api.getEvents(id).then(setEvents).catch(() => {});
   }
+    useEffect(() => {
+    const timer = setTimeout(() => setMinTimeDone(true), 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     loadAll();
     api.getTags().then(setAllTags).catch(() => {});
   }, [id]);
 
-  if (state.status === 'loading')
-    return <p className="text-zinc-400 text-center py-8">Loading…</p>;
+    if (state.status === 'loading' || !minTimeDone)
+    return (
+      <div className="flex min-h-[70vh] items-center justify-center px-4">
+        <div className="relative flex w-full max-w-md flex-col items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-[#0e151d]/95 px-8 py-12 text-center shadow-2xl shadow-black/50 backdrop-blur-sm">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#e58a3c]/20 blur-3xl" />
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f5b942] to-[#e58a3c]">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#101820]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="relative text-lg font-semibold text-white">Welcome to your ticket</p>
+          <p className="relative text-sm text-[#8b95a1]">Pulling up the details…</p>
+        </div>
+      </div>
+    );
   if (state.status === 'not-found')
-    return <p className="text-zinc-400 text-center py-8">Ticket not found.</p>;
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
+        <p className="text-lg font-semibold text-white">Ticket not found</p>
+        <p className="text-sm text-[#8b95a1]">It may have been deleted or you don&apos;t have access.</p>
+      </div>
+    );
   if (state.status === 'error')
-    return <p className="text-red-500 text-center py-8">{state.message}</p>;
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
+        <p className="text-lg font-semibold text-red-400">{state.message}</p>
+      </div>
+    );
 
   const { ticket } = state;
   const dueAt = ticket.due_at;

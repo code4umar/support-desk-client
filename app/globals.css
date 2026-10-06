@@ -86,3 +86,12 @@ select.field option { background: #111318; color: #f2f4f8; }
 .form { display: grid; gap: 8px; }
 .label { font-size: 14px; color: var(--muted); margin-top: 10px; }
 .actions { display: flex; gap: 12px; margin-top: 24px; }
+/* Dark dropdowns everywhere: black bg, white text, blue highlight */
+select {
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #000;
+  color: #fff;
+}

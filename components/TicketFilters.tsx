@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
 const inputClass =
-  'border border-white/20 bg-black/30 rounded-md px-3 py-2 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 transition-colors';
+  'border border-white/20 bg-black/30 rounded-md px-3 py-2 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 transition-colors [color-scheme:dark]';
 
 const FILTER_KEYS = ['q', 'status', 'priority', 'tag', 'assigneeId', 'overdue'];
 
