@@ -23,7 +23,10 @@ const LOGIN_IMAGE = '/Image.svg';
 const DEMO_EMAIL = 'admin@supportdesk.test';
 const DEMO_PASSWORD = ''; // Yahan demo password likh do. Khali rakha to sirf email bharega.
 
-const TICKETS_RESOLVED = 1284;
+type PublicStats = {
+  resolvedThisWeek: number;
+  latestResolved: { id: number; closedBy: string | null; minutes: number | null } | null;
+};
 
 const css = `
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
@@ -88,6 +91,7 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(true);
   const [success, setSuccess] = useState(false);
   const [count, setCount] = useState(0);
+  const [stats, setStats] = useState<PublicStats | null>(null);
 
   const canSubmit = email.trim() !== '' && password.trim() !== '' && !loading;
   const emailValid = EMAIL_RE.test(email.trim());
@@ -101,22 +105,36 @@ export default function LoginPage() {
     } catch {}
   }, []);
 
-  // Live counter: 0 se upar ginti
+  // Asli stats (bina login ke public route se)
   useEffect(() => {
+    const base = process.env.NEXT_PUBLIC_API_URL;
+    if (!base) return;
+    fetch(`${base}/stats/public`, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) setStats(d);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Live counter: 0 se asli number tak ginti
+  useEffect(() => {
+    if (!stats) return;
+    const target = stats.resolvedThisWeek;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setCount(TICKETS_RESOLVED);
+      setCount(target);
       return;
     }
     let raf = 0;
-    const start = performance.now() + 1000;
+    const start = performance.now() + 300;
     const tick = (now: number) => {
       const t = Math.min(Math.max((now - start) / 1600, 0), 1);
-      setCount(Math.round(TICKETS_RESOLVED * (1 - Math.pow(1 - t, 3))));
+      setCount(Math.round(target * (1 - Math.pow(1 - t, 3))));
       if (t < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [stats]);
 
   // Mouse spotlight + 3D tilt
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -167,7 +185,7 @@ export default function LoginPage() {
       } catch {}
       setSuccess(true);
       await new Promise((r) => setTimeout(r, 900));
-      router.push('/tickets');
+      router.push('/dashboard');
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 401) {
         setError('Invalid email or password');
@@ -212,28 +230,41 @@ export default function LoginPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#0e151d]/60 via-transparent to-transparent" />
 
             {/* Live counter */}
-            <div className="rise absolute left-6 top-6" style={{ animationDelay: '0.8s' }}>
-              <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
-                <p className={`${heading.className} text-3xl font-bold tabular-nums text-white`}>
-                  {count.toLocaleString('en-US')}
-                </p>
-                <p className="text-[11px] text-white/60">tickets resolved this week</p>
-              </div>
-            </div>
-
-            {/* Floating ticket card */}
-            <div className="rise absolute bottom-6 left-6" style={{ animationDelay: '1s' }}>
-              <div className="bob flex items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-white">Ticket #1042 resolved</p>
-                  <p className="text-[11px] text-white/60">Closed by Agent 2 in 4 min</p>
+            {stats && (
+              <div className="rise absolute left-6 top-6" style={{ animationDelay: '0.2s' }}>
+                <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
+                  <p className={`${heading.className} text-3xl font-bold tabular-nums text-white`}>
+                    {count.toLocaleString('en-US')}
+                  </p>
+                  <p className="text-[11px] text-white/60">tickets resolved this week</p>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Floating ticket card */}
+            {stats?.latestResolved && (
+              <div className="rise absolute bottom-6 left-6" style={{ animationDelay: '0.3s' }}>
+                <div className="bob flex items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-semibold text-white">
+                      Ticket #{stats.latestResolved.id} resolved
+                    </p>
+                    <p className="text-[11px] text-white/60">
+                      {stats.latestResolved.closedBy
+                        ? `Closed by ${stats.latestResolved.closedBy}`
+                        : 'Recently resolved'}
+                      {stats.latestResolved.minutes != null
+                        ? ` in ${stats.latestResolved.minutes} min`
+                        : ''}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right: login panel */}
@@ -388,7 +419,7 @@ export default function LoginPage() {
                   <path className="draw" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-white">Signed in. Opening your tickets…</p>
+              <p className="text-sm font-medium text-white">Signed in. Opening your dashboard…</p>
             </div>
           )}
 

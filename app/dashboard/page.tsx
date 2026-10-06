@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { slaInfo } from '@/lib/time';
 import RequireAuth from '@/components/RequireAuth';
+import TrendChart from '@/components/TrendChart';
+import RoleWelcome from '@/components/RoleWelcome';
 
 type Ticket = {
   id: number;
@@ -187,6 +189,7 @@ function DashboardInner() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
+        <RoleWelcome />
         <p className="text-sm text-zinc-500">Overview of your support desk</p>
       </div>
 
@@ -261,7 +264,7 @@ function DashboardInner() {
           </ul>
         )}
       </div>
-
+      <TrendChart tickets={tickets} />
       <div className="grid gap-4 md:grid-cols-2">
         <Bars title="Tickets by status" data={stats.byStatus} colors={statusColor} param="status" />
         <Bars title="Tickets by priority" data={stats.byPrio} colors={prioColor} param="priority" />
