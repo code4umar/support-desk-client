@@ -1,19 +1,29 @@
 @import "tailwindcss";
 
+/* Coding Pixel inspired theme: light grey-blue, navy text, turquoise accent */
 :root {
-  --background: #08090b;
-  --foreground: #f2f4f8;
-  --bg: #08090b;
-  --card: #111318;
-  --border: #23262e;
-  --text: #f2f4f8;
-  --muted: #8a90a0;
-  --accent: #14d9b5;
+  --background: #e9edef;
+  --foreground: #213558;
+  --bg: #e9edef;
+  --card: #ffffff;
+  --border: #d3dbe2;
+  --text: #213558;
+  --muted: #4a5f80;
+  --accent: #1fe5d8;
+  --accent-dark: #0fb5aa;
+  --on-accent: #213558;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--card);
+  --color-line: var(--border);
+  --color-navy: var(--text);
+  --color-muted: var(--muted);
+  --color-brand: var(--accent);
+  --color-brand-dark: var(--accent-dark);
+  --color-on-brand: var(--on-accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -21,7 +31,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
 }
 
 @keyframes fadeSlideUp {
@@ -41,20 +51,20 @@ body {
   padding: 16px 18px; transition: transform .15s, border-color .15s, box-shadow .15s;
 }
 .card:hover { transform: translateY(-2px); border-color: var(--accent);
-  box-shadow: 0 8px 30px -12px rgba(20,217,181,.35); }
+  box-shadow: 0 8px 30px -12px rgba(15,181,170,.30); }
 .title { font-weight: 600; }
 .id { color: var(--muted); font-weight: 400; }
 
 .badges { display: flex; gap: 8px; margin-top: 10px; }
 .badge { font-size: 12px; padding: 3px 10px; border-radius: 999px; text-transform: capitalize;
   border: 1px solid var(--border); color: var(--muted); }
-.prio-low     { color: #7dd3fc; border-color: #7dd3fc55; background: #7dd3fc14; }
-.prio-normal  { color: #a5b4fc; border-color: #a5b4fc55; background: #a5b4fc14; }
-.prio-high    { color: #fbbf24; border-color: #fbbf2455; background: #fbbf2414; }
-.prio-urgent  { color: #f87171; border-color: #f8717155; background: #f8717114; }
-.status-open        { color: var(--accent); }
-.status-in_progress { color: #fbbf24; }
-.status-resolved    { color: #4ade80; }
+.prio-low     { color: #0369a1; border-color: #0369a155; background: #0369a114; }
+.prio-normal  { color: #4338ca; border-color: #4338ca55; background: #4338ca14; }
+.prio-high    { color: #b45309; border-color: #b4530955; background: #b4530914; }
+.prio-urgent  { color: #b91c1c; border-color: #b91c1c55; background: #b91c1c14; }
+.status-open        { color: var(--accent-dark); }
+.status-in_progress { color: #b45309; }
+.status-resolved    { color: #15803d; }
 .status-closed      { color: var(--muted); }
 
 .btn {
@@ -65,8 +75,8 @@ body {
 }
 .btn:hover { border-color: var(--accent); }
 .btn-primary {
-  background: linear-gradient(135deg, #14d9b5, #0aa48a); color: #041512; border: none;
-  box-shadow: 0 6px 20px -6px rgba(20,217,181,.6);
+  background: var(--accent); color: var(--on-accent); border: none;
+  box-shadow: 0 6px 20px -6px rgba(15,181,170,.45);
 }
 .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
 .btn.disabled { opacity: .35; pointer-events: none; }
@@ -77,21 +87,15 @@ body {
 .field {
   width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--card); color: var(--text); font-size: 15px; outline: none;
-  transition: border-color .15s, box-shadow .15s; color-scheme: dark;
+  transition: border-color .15s, box-shadow .15s; color-scheme: light;
 }
-.field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(20,217,181,.2); }
-select.field option { background: #111318; color: #f2f4f8; }
+.field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(31,229,216,.35); }
+select.field option { background: #ffffff; color: #213558; }
 .page-title { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
 .page-sub { color: var(--muted); margin: 6px 0 24px; }
 .form { display: grid; gap: 8px; }
 .label { font-size: 14px; color: var(--muted); margin-top: 10px; }
 .actions { display: flex; gap: 12px; margin-top: 24px; }
-/* Dark dropdowns everywhere: black bg, white text, blue highlight */
-select {
-  color-scheme: dark;
-}
-
-select option {
-  background-color: #000;
-  color: #fff;
-}
+/* Dropdowns follow the light theme */
+select { color-scheme: light; }
+select option { background-color: #fff; color: #213558; }

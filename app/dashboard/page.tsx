@@ -21,7 +21,7 @@ const PRIORITIES = ['low', 'normal', 'high', 'urgent'];
 const PRIO_RANK: Record<string, number> = { urgent: 0, high: 1, normal: 2, low: 3 };
 
 const statusColor: Record<string, string> = {
-  open: 'bg-teal-400',
+  open: 'bg-brand',
   in_progress: 'bg-amber-400',
   resolved: 'bg-green-400',
   closed: 'bg-zinc-500',
@@ -33,10 +33,10 @@ const prioColor: Record<string, string> = {
   urgent: 'bg-red-400',
 };
 const priorityStyles: Record<string, string> = {
-  low: 'bg-sky-500/10 text-sky-400 border-sky-500/30',
-  normal: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
-  high: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-  urgent: 'bg-red-500/10 text-red-400 border-red-500/30',
+  low: 'bg-sky-500/10 text-sky-700 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 const pick = (res: any): Ticket[] =>
@@ -82,9 +82,9 @@ function Stat({
   label, value, tone, href,
 }: { label: string; value: number | string; tone?: string; href?: string }) {
   const body = (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-teal-400/50">
-      <div className="text-xs uppercase tracking-wide text-zinc-500">{label}</div>
-      <div className={`mt-1 text-3xl font-bold ${tone ?? 'text-white'}`}>{value}</div>
+    <div className="rounded-xl border border-line bg-navy/[0.03] p-4 transition-colors hover:border-brand-dark/">
+      <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
+      <div className={`mt-1 text-3xl font-bold ${tone ?? 'text-navy'}`}>{value}</div>
     </div>
   );
   return href ? <Link href={href}>{body}</Link> : body;
@@ -100,18 +100,18 @@ function Bars({
 }) {
   const max = Math.max(1, ...Object.values(data));
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-      <h2 className="mb-4 text-sm font-semibold text-zinc-300">{title}</h2>
+    <div className="rounded-xl border border-line bg-navy/[0.03] p-5">
+      <h2 className="mb-4 text-sm font-semibold text-navy">{title}</h2>
       <div className="space-y-3">
         {Object.entries(data).map(([k, v]) => (
           <Link key={k} href={`/tickets?${param}=${k}`} className="group block">
-            <div className="mb-1 flex justify-between text-xs text-zinc-400 group-hover:text-white">
+            <div className="mb-1 flex justify-between text-xs text-muted group-hover:text-navy">
               <span className="capitalize">{k.replace('_', ' ')}</span>
               <span>{v}</span>
             </div>
-            <div className="h-2 rounded-full bg-white/5">
+            <div className="h-2 rounded-full bg-navy/5">
               <div
-                className={`h-2 rounded-full ${colors[k] ?? 'bg-teal-400'} transition-all`}
+                className={`h-2 rounded-full ${colors[k] ?? 'bg-brand'} transition-all`}
                 style={{ width: `${(v / max) * 100}%` }}
               />
             </div>
@@ -125,17 +125,17 @@ function Bars({
 function DashboardSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div className="h-12 w-48 rounded-lg bg-white/5" />
+      <div className="h-12 w-48 rounded-lg bg-navy/5" />
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-[84px] rounded-xl bg-white/5" />
+          <div key={i} className="h-[84px] rounded-xl bg-navy/5" />
         ))}
       </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="h-44 rounded-xl bg-white/5" />
-        <div className="h-44 rounded-xl bg-white/5" />
+        <div className="h-44 rounded-xl bg-navy/5" />
+        <div className="h-44 rounded-xl bg-navy/5" />
       </div>
-      <div className="h-56 rounded-xl bg-white/5" />
+      <div className="h-56 rounded-xl bg-navy/5" />
     </div>
   );
 }
@@ -182,7 +182,7 @@ function DashboardInner() {
     };
   }, [tickets]);
 
-  if (error) return <p className="text-red-400">{error}</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
   if (!tickets) return <DashboardSkeleton />;
 
   return (
@@ -190,23 +190,23 @@ function DashboardInner() {
       <div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <RoleWelcome />
-        <p className="text-sm text-zinc-500">Overview of your support desk</p>
+        <p className="text-sm text-muted">Overview of your support desk</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         <Stat label="Total tickets" value={stats.total} href="/tickets" />
-        <Stat label="Open" value={stats.byStatus.open} tone="text-teal-400" href="/tickets?status=open" />
-        <Stat label="In progress" value={stats.byStatus.in_progress} tone="text-amber-400" href="/tickets?status=in_progress" />
+        <Stat label="Open" value={stats.byStatus.open} tone="text-brand-dark" href="/tickets?status=open" />
+        <Stat label="In progress" value={stats.byStatus.in_progress} tone="text-amber-700" href="/tickets?status=in_progress" />
         <Stat
           label="Overdue (SLA)"
           value={stats.overdue}
-          tone={stats.overdue ? 'text-red-400' : 'text-white'}
+          tone={stats.overdue ? 'text-red-600' : 'text-navy'}
           href="/tickets?overdue=true&sortBy=dueAt&order=asc"
         />
         <Stat
           label="Resolved / closed"
           value={stats.byStatus.resolved + stats.byStatus.closed}
-          tone="text-green-400"
+          tone="text-green-700"
           href="/tickets?status=resolved"
         />
       </div>
@@ -214,34 +214,34 @@ function DashboardInner() {
       {/* Needs attention */}
       <div className="rounded-xl border border-red-500/20 bg-red-500/[0.03] p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-200">
+          <h2 className="text-sm font-semibold text-navy">
             Needs attention{' '}
             {stats.attentionTotal > 0 && (
-              <span className="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-400">
+              <span className="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-600">
                 {stats.attentionTotal}
               </span>
             )}
           </h2>
-          <Link href="/tickets?overdue=true&sortBy=dueAt&order=asc" className="text-xs text-teal-400 hover:underline">
+          <Link href="/tickets?overdue=true&sortBy=dueAt&order=asc" className="text-xs text-brand-dark hover:underline">
             View overdue →
           </Link>
         </div>
         {stats.attention.length === 0 ? (
-          <p className="py-4 text-center text-sm text-zinc-500">
+          <p className="py-4 text-center text-sm text-muted">
             Nothing urgent right now. Nice work.
           </p>
         ) : (
-          <ul className="divide-y divide-white/5">
+          <ul className="divide-y divide-line">
             {stats.attention.map((t) => {
               const sla = slaInfo(t.due_at, t.status);
               return (
                 <li key={t.id}>
                   <Link
                     href={`/tickets/${t.id}`}
-                    className="flex items-center justify-between gap-3 py-2.5 text-sm hover:text-teal-300"
+                    className="flex items-center justify-between gap-3 py-2.5 text-sm hover:text-navy"
                   >
                     <span className="min-w-0 truncate">
-                      {t.subject} <span className="text-zinc-500">#{t.id}</span>
+                      {t.subject} <span className="text-muted">#{t.id}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
                       {sla && (
@@ -270,17 +270,17 @@ function DashboardInner() {
         <Bars title="Tickets by priority" data={stats.byPrio} colors={prioColor} param="priority" />
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
+      <div className="rounded-xl border border-line bg-navy/[0.03] p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-300">Latest tickets</h2>
-          <Link href="/tickets" className="text-xs text-teal-400 hover:underline">View all →</Link>
+          <h2 className="text-sm font-semibold text-navy">Latest tickets</h2>
+          <Link href="/tickets" className="text-xs text-brand-dark hover:underline">View all →</Link>
         </div>
-        <ul className="divide-y divide-white/5">
+        <ul className="divide-y divide-line">
           {stats.recent.map((t) => (
             <li key={t.id}>
-              <Link href={`/tickets/${t.id}`} className="flex items-center justify-between py-2.5 text-sm hover:text-teal-300">
-                <span>{t.subject} <span className="text-zinc-500">#{t.id}</span></span>
-                <span className="text-xs capitalize text-zinc-500">{t.status.replace('_', ' ')}</span>
+              <Link href={`/tickets/${t.id}`} className="flex items-center justify-between py-2.5 text-sm hover:text-navy">
+                <span>{t.subject} <span className="text-muted">#{t.id}</span></span>
+                <span className="text-xs capitalize text-muted">{t.status.replace('_', ' ')}</span>
               </Link>
             </li>
           ))}

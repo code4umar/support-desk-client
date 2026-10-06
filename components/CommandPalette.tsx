@@ -119,11 +119,11 @@ export default function CommandPalette() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 px-4 pt-[15vh] backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-start justify-center bg-navy/40 px-4 pt-[15vh] backdrop-blur-sm"
       onClick={() => setOpen(false)}
     >
       <div
-        className="w-full max-w-lg overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl"
+        className="w-full max-w-lg overflow-hidden rounded-xl border border-line bg-surface shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <input
@@ -132,11 +132,11 @@ export default function CommandPalette() {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={onInputKey}
           placeholder="Search tickets, or type a command…"
-          className="w-full border-b border-white/10 bg-transparent px-4 py-3 text-sm outline-none placeholder:text-zinc-500"
+          className="w-full border-b border-line bg-transparent px-4 py-3 text-sm outline-none placeholder:text-muted"
         />
         <ul className="max-h-80 overflow-y-auto p-2">
           {items.length === 0 && (
-            <li className="px-3 py-6 text-center text-sm text-zinc-500">No results</li>
+            <li className="px-3 py-6 text-center text-sm text-muted">No results</li>
           )}
           {items.map((it, i) => (
             <li key={it.id}>
@@ -144,16 +144,16 @@ export default function CommandPalette() {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => go(it)}
                 className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm ${
-                  i === active ? 'bg-teal-500/15 text-teal-300' : 'text-zinc-300'
+                  i === active ? 'bg-teal-500/15 text-brand-dark' : 'text-navy'
                 }`}
               >
                 <span className="truncate">{it.label}</span>
-                <span className="ml-3 shrink-0 text-xs capitalize text-zinc-500">{it.hint}</span>
+                <span className="ml-3 shrink-0 text-xs capitalize text-muted">{it.hint}</span>
               </button>
             </li>
           ))}
         </ul>
-        <div className="border-t border-white/10 px-4 py-2 text-[11px] text-zinc-500">
+        <div className="border-t border-line px-4 py-2 text-[11px] text-muted">
           ↑↓ navigate · Enter open · Esc close
         </div>
       </div>

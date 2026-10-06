@@ -16,17 +16,17 @@ export default function Pager({
       <button
         disabled={page <= 1}
         onClick={() => onPageChange(page - 1)}
-        className="border border-white/20 rounded-md px-4 py-2 text-sm transition-colors hover:border-teal-400 disabled:opacity-30 disabled:hover:border-white/20"
+        className="border border-line rounded-md px-4 py-2 text-sm transition-colors hover:border-brand-dark disabled:opacity-30 disabled:hover:border-line"
       >
         Previous
       </button>
-      <span className="text-sm text-zinc-400">
+      <span className="text-sm text-muted">
         Page {page} of {totalPages}
       </span>
       <button
         disabled={page >= totalPages}
         onClick={() => onPageChange(page + 1)}
-        className="border border-white/20 rounded-md px-4 py-2 text-sm transition-colors hover:border-teal-400 disabled:opacity-30 disabled:hover:border-white/20"
+        className="border border-line rounded-md px-4 py-2 text-sm transition-colors hover:border-brand-dark disabled:opacity-30 disabled:hover:border-line"
       >
         Next
       </button>

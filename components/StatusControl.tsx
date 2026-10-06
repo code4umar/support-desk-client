@@ -43,8 +43,8 @@ export default function StatusControl({
   if (moves.length === 0) return null;
 
   return (
-    <div className="mt-4 border-t border-white/10 pt-4">
-      <div className="text-xs font-semibold tracking-wide text-zinc-400 mb-2">Change status</div>
+    <div className="mt-4 border-t border-line pt-4">
+      <div className="text-xs font-semibold tracking-wide text-muted mb-2">Change status</div>
       {error && (
         <p className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded-md py-1.5 px-3 mb-2">
           {error}
@@ -54,7 +54,7 @@ export default function StatusControl({
         {moves.map((m) => (
           <button
             key={m}
-            className="border border-white/20 rounded-md px-3 py-1.5 text-sm transition-colors hover:border-teal-400 hover:text-teal-400"
+            className="border border-line rounded-md px-3 py-1.5 text-sm transition-colors hover:border-brand-dark hover:text-brand-dark"
             onClick={() => submitMove(m)}
           >
             → {m}
@@ -64,13 +64,13 @@ export default function StatusControl({
       {pendingTarget && (
         <div className="mt-3 flex gap-2 items-center">
           <input
-            className="border border-white/20 bg-transparent rounded-md p-2 text-sm flex-1 outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 transition-colors"
+            className="border border-line bg-transparent rounded-md p-2 text-sm flex-1 outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand/50 transition-colors"
             placeholder="Reason for reopening (required)"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
           <button
-            className="bg-teal-500 text-black font-semibold rounded-md px-3 py-2 text-sm transition-all hover:bg-teal-400 disabled:opacity-40 disabled:hover:bg-teal-500"
+            className="bg-brand text-on-brand font-semibold rounded-md px-3 py-2 text-sm transition-all hover:bg-brand-dark disabled:opacity-40 disabled:hover:bg-brand"
             disabled={!note.trim()}
             onClick={() => submitMove(pendingTarget)}
           >

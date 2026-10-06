@@ -50,19 +50,19 @@ export default function NewTicketsBanner() {
   if (!user || fresh === 0) return null;
 
   return (
-    <div className="fixed bottom-5 left-5 z-[90] flex items-center gap-3 rounded-lg border border-teal-500/30 bg-zinc-950 px-4 py-2.5 text-sm shadow-xl">
-      <span className="text-zinc-200">
+    <div className="fixed bottom-5 left-5 z-[90] flex items-center gap-3 rounded-lg border border-brand-dark/30 bg-surface px-4 py-2.5 text-sm shadow-xl">
+      <span className="text-navy">
         {fresh} new ticket{fresh === 1 ? '' : 's'}
       </span>
       <button
         onClick={() => window.location.reload()}
-        className="rounded-md bg-teal-500 px-3 py-1 text-xs font-semibold text-black hover:bg-teal-400"
+        className="rounded-md bg-brand px-3 py-1 text-xs font-semibold text-on-brand hover:bg-brand-dark"
       >
         Refresh
       </button>
       <button
         onClick={() => setFresh(0)}
-        className="text-xs text-zinc-500 hover:text-white"
+        className="text-xs text-muted hover:text-navy"
         aria-label="dismiss"
       >
         ✕

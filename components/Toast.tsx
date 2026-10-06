@@ -28,8 +28,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             className={`animate-fade-slide-up rounded-md border px-4 py-3 text-sm font-medium shadow-lg backdrop-blur ${
               t.type === 'success'
-                ? 'border-teal-500/30 bg-teal-500/10 text-teal-300'
-                : 'border-red-500/30 bg-red-500/10 text-red-400'
+                ? 'border-brand-dark/30 bg-brand/15 text-brand-dark'
+                : 'border-red-500/30 bg-red-500/10 text-red-600'
             }`}
           >
             {t.message}

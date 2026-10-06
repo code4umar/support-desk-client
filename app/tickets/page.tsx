@@ -19,17 +19,17 @@ type State =
   | { status: 'ready'; data: Envelope<Ticket> };
 
 const priorityStyles: Record<string, string> = {
-  low: 'bg-sky-500/10 text-sky-400 border-sky-500/30',
-  normal: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
-  high: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-  urgent: 'bg-red-500/10 text-red-400 border-red-500/30',
+  low: 'bg-sky-500/10 text-sky-700 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 const statusStyles: Record<string, string> = {
-  open: 'text-teal-400',
-  in_progress: 'text-amber-400',
-  resolved: 'text-green-400',
-  closed: 'text-zinc-500',
+  open: 'text-brand-dark',
+  in_progress: 'text-amber-700',
+  resolved: 'text-green-700',
+  closed: 'text-muted',
 };
 
 function csvCell(v: unknown): string {
@@ -41,12 +41,12 @@ function ListSkeleton() {
   return (
     <div className="flex flex-col gap-3 animate-pulse">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex items-center justify-between rounded-xl border border-white/10 bg-black/30 p-4">
+        <div key={i} className="flex items-center justify-between rounded-xl border border-line bg-surface p-4">
           <div className="space-y-2">
-            <div className="h-4 w-56 rounded bg-white/10" />
-            <div className="h-3 w-20 rounded bg-white/5" />
+            <div className="h-4 w-56 rounded bg-navy/10" />
+            <div className="h-3 w-20 rounded bg-navy/5" />
           </div>
-          <div className="h-6 w-16 rounded-full bg-white/10" />
+          <div className="h-6 w-16 rounded-full bg-navy/10" />
         </div>
       ))}
     </div>
@@ -246,27 +246,27 @@ function TicketsPageInner() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="relative rounded-xl border border-teal-500/20 bg-gradient-to-br from-teal-950 via-zinc-900 to-black p-5 mb-6 overflow-hidden">
-        <div className="pointer-events-none absolute -top-10 -right-10 h-48 w-48 rounded-full bg-teal-400/25 blur-3xl" />
+      <div className="relative rounded-xl border border-brand-dark/ bg-gradient-to-br from-navy via-white to-brand/25 p-5 mb-6 overflow-hidden">
+        <div className="pointer-events-none absolute -top-10 -right-10 h-48 w-48 rounded-full bg-brand/40 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-indigo-500/15 blur-3xl" />
         <div className="relative flex items-center justify-between gap-3">
-          <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-2">
+          <div className="rounded-lg border border-line bg-navy/5 px-4 py-2">
             <h1 className="text-2xl font-bold">Tickets</h1>
-            <p className="text-zinc-400 text-sm mt-1">Track and manage support requests</p>
+            <p className="text-muted text-sm mt-1">Track and manage support requests</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {state.status === 'ready' && rows.length > 0 && (
               <button
                 onClick={exportCsv}
                 disabled={exporting}
-                className="rounded-md border border-white/20 px-3 py-2 text-sm text-zinc-200 transition-colors hover:border-teal-400 disabled:opacity-50"
+                className="rounded-md border border-line px-3 py-2 text-sm text-navy transition-colors hover:border-brand-dark disabled:opacity-50"
               >
                 {exporting ? 'Exporting…' : 'Export CSV'}
               </button>
             )}
             <Link
               href="/tickets/new"
-              className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-teal-400 hover:scale-[1.02] active:scale-[0.98]"
+              className="bg-brand text-on-brand font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-brand-dark hover:scale-[1.02] active:scale-[0.98]"
             >
               + New ticket
             </Link>
@@ -282,11 +282,11 @@ function TicketsPageInner() {
       )}
 
       {state.status === 'ready' && rows.length === 0 && (
-        <div className="rounded-xl border border-white/10 bg-black/20 py-12 text-center">
-          <p className="text-lg font-semibold text-zinc-200">
+        <div className="rounded-xl border border-line bg-surface py-12 text-center">
+          <p className="text-lg font-semibold text-navy">
             {queryString ? 'No tickets match this filter' : 'No tickets yet'}
           </p>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 text-sm text-muted">
             {queryString
               ? 'Try removing a filter or clearing the search.'
               : 'Create your first ticket to get started.'}
@@ -295,14 +295,14 @@ function TicketsPageInner() {
             {queryString && (
               <Link
                 href="/tickets"
-                className="rounded-md border border-white/20 px-4 py-2 text-sm hover:border-teal-400"
+                className="rounded-md border border-line px-4 py-2 text-sm hover:border-brand-dark"
               >
                 Clear filters
               </Link>
             )}
             <Link
               href="/tickets/new"
-              className="rounded-md bg-teal-500 px-4 py-2 text-sm font-semibold text-black hover:bg-teal-400"
+              className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-on-brand hover:bg-brand-dark"
             >
               + New ticket
             </Link>
@@ -313,11 +313,11 @@ function TicketsPageInner() {
       {state.status === 'ready' && rows.length > 0 && (
         <>
           {bulkEnabled && (
-            <div className="sticky top-[72px] z-30 mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-black/70 px-4 py-2.5 backdrop-blur">
-              <label className="flex items-center gap-2 text-sm text-zinc-300">
+            <div className="sticky top-[72px] z-30 mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface/90 px-4 py-2.5 backdrop-blur">
+              <label className="flex items-center gap-2 text-sm text-navy">
                 <input
                   type="checkbox"
-                  className="accent-teal-500 h-4 w-4"
+                  className="accent-brand-dark h-4 w-4"
                   checked={allSelected}
                   onChange={toggleAll}
                 />
@@ -330,7 +330,7 @@ function TicketsPageInner() {
                     <>
                       <select
                         aria-label="bulk status"
-                        className="rounded-md border border-white/20 bg-black/40 px-2 py-1.5 text-sm outline-none focus:border-teal-400 [color-scheme:dark]"
+                        className="rounded-md border border-line bg-surface px-2 py-1.5 text-sm outline-none focus:border-brand-dark [color-scheme:light]"
                         value={bulkTarget}
                         onChange={(e) => setBulkTarget(e.target.value)}
                       >
@@ -341,7 +341,7 @@ function TicketsPageInner() {
                       </select>
                       {needsNoteUI && (
                         <input
-                          className="w-48 rounded-md border border-white/20 bg-transparent px-2 py-1.5 text-sm outline-none focus:border-teal-400"
+                          className="w-48 rounded-md border border-line bg-transparent px-2 py-1.5 text-sm outline-none focus:border-brand-dark"
                           placeholder="Reason for reopening"
                           value={bulkNote}
                           onChange={(e) => setBulkNote(e.target.value)}
@@ -350,7 +350,7 @@ function TicketsPageInner() {
                       <button
                         onClick={bulkChangeStatus}
                         disabled={busy || !bulkTarget}
-                        className="rounded-md border border-teal-500/30 px-3 py-1.5 text-sm text-teal-400 hover:bg-teal-500/10 disabled:opacity-50"
+                        className="rounded-md border border-brand-dark/ px-3 py-1.5 text-sm text-brand-dark hover:bg-brand/15 disabled:opacity-50"
                       >
                         Apply
                       </button>
@@ -359,7 +359,7 @@ function TicketsPageInner() {
                   {canAssign && (
                     <>
                       <input
-                        className="w-28 rounded-md border border-white/20 bg-transparent px-2 py-1.5 text-sm outline-none focus:border-teal-400"
+                        className="w-28 rounded-md border border-line bg-transparent px-2 py-1.5 text-sm outline-none focus:border-brand-dark"
                         placeholder="User ID"
                         value={assigneeInput}
                         onChange={(e) => setAssigneeInput(e.target.value)}
@@ -367,7 +367,7 @@ function TicketsPageInner() {
                       <button
                         onClick={bulkAssign}
                         disabled={busy}
-                        className="rounded-md border border-teal-500/30 px-3 py-1.5 text-sm text-teal-400 hover:bg-teal-500/10 disabled:opacity-50"
+                        className="rounded-md border border-brand-dark/ px-3 py-1.5 text-sm text-brand-dark hover:bg-brand/15 disabled:opacity-50"
                       >
                         Assign
                       </button>
@@ -377,7 +377,7 @@ function TicketsPageInner() {
                     <button
                       onClick={bulkDelete}
                       disabled={busy}
-                      className="rounded-md border border-red-500/30 px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                      className="rounded-md border border-red-500/30 px-3 py-1.5 text-sm text-red-600 hover:bg-red-500/10 disabled:opacity-50"
                     >
                       Delete
                     </button>
@@ -396,31 +396,31 @@ function TicketsPageInner() {
                     <input
                       type="checkbox"
                       aria-label={`select ticket ${t.id}`}
-                      className="accent-teal-500 h-4 w-4 self-center shrink-0"
+                      className="accent-brand-dark h-4 w-4 self-center shrink-0"
                       checked={selected.has(t.id)}
                       onChange={() => toggle(t.id)}
                     />
                   )}
                   <Link
                     href={`/tickets/${t.id}`}
-                    className={`block flex-1 min-w-0 rounded-xl border bg-black/30 backdrop-blur p-4 transition-all hover:border-teal-400/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-teal-500/10 ${
-                      selected.has(t.id) ? 'border-teal-400/60' : 'border-white/10'
+                    className={`block flex-1 min-w-0 rounded-xl border bg-surface backdrop-blur p-4 transition-all hover:border-brand-dark/ hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-dark/15 ${
+                      selected.has(t.id) ? 'border-brand-dark/' : 'border-line'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="min-w-0">
                         <p className="font-medium truncate">
                           {t.subject}{' '}
-                          <span className="text-zinc-500 font-normal">#{t.id}</span>
+                          <span className="text-muted font-normal">#{t.id}</span>
                         </p>
-                        <p className={`text-sm mt-1 capitalize ${statusStyles[t.status] ?? 'text-zinc-400'}`}>
+                        <p className={`text-sm mt-1 capitalize ${statusStyles[t.status] ?? 'text-muted'}`}>
                           {t.status.replace('_', ' ')}
                         </p>
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-1.5">
                         <span
                           className={`text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border capitalize ${
-                            priorityStyles[t.priority] ?? 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30'
+                            priorityStyles[t.priority] ?? 'bg-navy/5 text-muted border-navy/20'
                           }`}
                         >
                           {t.priority}
@@ -455,8 +455,8 @@ export default function TicketsPage() {
       <Suspense
         fallback={
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-xl border border-teal-500/20 bg-gradient-to-br from-teal-950 via-zinc-900 to-black p-5 mb-6 h-[88px] animate-pulse" />
-            <div className="rounded-xl border border-white/10 bg-black/40 p-4 mb-6 h-[76px] animate-pulse" />
+            <div className="rounded-xl border border-brand-dark/ bg-gradient-to-br from-navy via-white to-brand/25 p-5 mb-6 h-[88px] animate-pulse" />
+            <div className="rounded-xl border border-line bg-surface p-4 mb-6 h-[76px] animate-pulse" />
             <ListSkeleton />
           </div>
         }

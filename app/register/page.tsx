@@ -47,19 +47,19 @@ const css = `
 
 const inputClass =
   'peer h-14 w-full rounded-xl border border-white/10 bg-white/5 px-4 pt-4 text-sm text-white outline-none transition-all duration-200 ' +
-  'focus:border-[#e58a3c] focus:bg-white/[0.07] focus:ring-4 focus:ring-[#e58a3c]/15 ' +
-  '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_#141d27] [&:-webkit-autofill]:[-webkit-text-fill-color:#ffffff]';
+  'focus:border-[#1fe5d8] focus:bg-white/[0.07] focus:ring-4 focus:ring-[#1fe5d8]/15 ' +
+  '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_#1b2c4d] [&:-webkit-autofill]:[-webkit-text-fill-color:#ffffff]';
 
 const labelClass =
-  'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#8b95a1] transition-all duration-200 ' +
-  'peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-[#e58a3c] ' +
+  'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#9fb0c8] transition-all duration-200 ' +
+  'peer-focus:top-2.5 peer-focus:translate-y-0 peer-focus:text-[10px] peer-focus:text-[#1fe5d8] ' +
   'peer-[:not(:placeholder-shown)]:top-2.5 peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-[10px] ' +
   'peer-[:-webkit-autofill]:top-2.5 peer-[:-webkit-autofill]:translate-y-0 peer-[:-webkit-autofill]:text-[10px]';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const STRENGTH_LABELS = ['Too short', 'Weak', 'Okay', 'Good', 'Strong'];
-const STRENGTH_COLORS = ['bg-white/10', 'bg-red-400', 'bg-[#e58a3c]', 'bg-[#f5b942]', 'bg-emerald-400'];
+const STRENGTH_COLORS = ['bg-white/10', 'bg-red-400', 'bg-[#1fe5d8]', 'bg-[#7df5ec]', 'bg-emerald-400'];
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -120,12 +120,12 @@ export default function RegisterPage() {
         className="flow w-full max-w-sm rounded-2xl p-px shadow-2xl shadow-black/50"
         style={{
           background:
-            'linear-gradient(110deg, #e58a3c88, #ffffff10, #f7f76a66, #ffffff10, #e58a3c88)',
+            'linear-gradient(110deg, #1fe5d888, #ffffff10, #7df5ec66, #ffffff10, #1fe5d888)',
           backgroundSize: '200% 100%',
         }}
       >
-        <div className="relative overflow-hidden rounded-[15px] bg-[#0e151d]">
-          <div className="glow pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-[#e58a3c]/25 blur-3xl" />
+        <div className="relative overflow-hidden rounded-[15px] bg-[#162540]">
+          <div className="glow pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-[#1fe5d8]/25 blur-3xl" />
 
           <div className="relative px-7 py-8">
             <h1
@@ -134,7 +134,7 @@ export default function RegisterPage() {
             >
               Create account
             </h1>
-            <p className="rise mb-6 mt-1.5 text-sm text-[#8b95a1]" style={{ animationDelay: '0.18s' }}>
+            <p className="rise mb-6 mt-1.5 text-sm text-[#9fb0c8]" style={{ animationDelay: '0.18s' }}>
               Join Deskly and start resolving tickets
             </p>
 
@@ -177,8 +177,8 @@ export default function RegisterPage() {
                   Email address
                 </label>
                 {emailValid && (
-                  <span className="pop absolute right-4 top-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#e58a3c]">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-[#101820]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                  <span className="pop absolute right-4 top-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-[#1fe5d8]">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-[#162540]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </span>
@@ -205,7 +205,7 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#8b95a1] transition-colors hover:text-[#e58a3c]"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-[#9fb0c8] transition-colors hover:text-[#1fe5d8]"
                   >
                     {showPassword ? (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -233,24 +233,24 @@ export default function RegisterPage() {
                         />
                       ))}
                     </div>
-                    <p className="mt-1.5 text-[11px] text-[#8b95a1]">
+                    <p className="mt-1.5 text-[11px] text-[#9fb0c8]">
                       {STRENGTH_LABELS[score]}
                     </p>
                   </div>
                 )}
                 {capsOn && (
-                  <p className="mt-2 text-xs text-[#f5b942]">Caps Lock is on</p>
+                  <p className="mt-2 text-xs text-[#7df5ec]">Caps Lock is on</p>
                 )}
               </div>
 
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="rise shimmer relative mt-1 flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#e58a3c] to-[#f5b942] text-sm font-semibold text-[#101820] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#e58a3c]/30 active:translate-y-0 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                className="rise shimmer relative mt-1 flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-[#1fe5d8] to-[#7df5ec] text-sm font-semibold text-[#162540] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#1fe5d8]/30 active:translate-y-0 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                 style={{ animationDelay: '0.44s' }}
               >
                 {loading && (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#101820]/30 border-t-[#101820]" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#162540]/30 border-t-[#162540]" />
                 )}
                 {loading ? 'Creating account…' : 'Create account'}
               </button>
@@ -262,10 +262,10 @@ export default function RegisterPage() {
             className="rise relative flex flex-wrap items-center justify-center gap-3 border-t border-white/10 bg-black/20 px-7 py-4"
             style={{ animationDelay: '0.52s' }}
           >
-            <p className="text-xs text-[#8b95a1]">Already have an account?</p>
+            <p className="text-xs text-[#9fb0c8]">Already have an account?</p>
             <Link
               href="/login"
-              className="rounded-full border border-[#e58a3c]/50 px-4 py-1.5 text-xs font-semibold text-[#e58a3c] transition-all duration-200 hover:bg-[#e58a3c] hover:text-[#101820]"
+              className="rounded-full border border-[#1fe5d8]/50 px-4 py-1.5 text-xs font-semibold text-[#1fe5d8] transition-all duration-200 hover:bg-[#1fe5d8] hover:text-[#162540]"
             >
               Log in
             </Link>
@@ -273,9 +273,9 @@ export default function RegisterPage() {
 
           {/* Success overlay */}
           {success && (
-            <div className="rise absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-[#0e151d]/95 backdrop-blur-sm">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f5b942] to-[#e58a3c]">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#101820]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <div className="rise absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-[#162540]/95 backdrop-blur-sm">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#7df5ec] to-[#1fe5d8]">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#162540]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path className="draw" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>

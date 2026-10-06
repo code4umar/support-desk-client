@@ -18,21 +18,21 @@ type State =
   | { status: 'ready'; ticket: any };
 
 const priorityStyles: Record<string, string> = {
-  low: 'bg-sky-500/10 text-sky-400 border-sky-500/30',
-  normal: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
-  high: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-  urgent: 'bg-red-500/10 text-red-400 border-red-500/30',
+  low: 'bg-sky-500/10 text-sky-700 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 const statusStyles: Record<string, string> = {
-  open: 'text-teal-400',
-  in_progress: 'text-amber-400',
-  resolved: 'text-green-400',
-  closed: 'text-zinc-500',
+  open: 'text-brand-dark',
+  in_progress: 'text-amber-700',
+  resolved: 'text-green-700',
+  closed: 'text-muted',
 };
 
 const inputClass =
-  'border border-white/20 bg-transparent rounded-md p-2 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 transition-colors';
+  'border border-line bg-transparent rounded-md p-2 text-sm outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand/50 transition-colors';
 
 function TicketDetailInner() {
   const { id } = useParams<{ id: string }>();
@@ -87,29 +87,29 @@ function TicketDetailInner() {
     if (state.status === 'loading' || !minTimeDone)
     return (
       <div className="flex min-h-[70vh] items-center justify-center px-4">
-        <div className="relative flex w-full max-w-md flex-col items-center gap-4 overflow-hidden rounded-2xl border border-white/10 bg-[#0e151d]/95 px-8 py-12 text-center shadow-2xl shadow-black/50 backdrop-blur-sm">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#e58a3c]/20 blur-3xl" />
-          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#f5b942] to-[#e58a3c]">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#101820]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+        <div className="relative flex w-full max-w-md flex-col items-center gap-4 overflow-hidden rounded-2xl border border-line bg-surface/95 px-8 py-12 text-center shadow-2xl shadow-navy/20 backdrop-blur-sm">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-brand/30 blur-3xl" />
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-dark">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-on-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <p className="relative text-lg font-semibold text-white">Welcome to your ticket</p>
-          <p className="relative text-sm text-[#8b95a1]">Pulling up the details…</p>
+          <p className="relative text-lg font-semibold text-navy">Welcome to your ticket</p>
+          <p className="relative text-sm text-muted">Pulling up the details…</p>
         </div>
       </div>
     );
   if (state.status === 'not-found')
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
-        <p className="text-lg font-semibold text-white">Ticket not found</p>
-        <p className="text-sm text-[#8b95a1]">It may have been deleted or you don&apos;t have access.</p>
+        <p className="text-lg font-semibold text-navy">Ticket not found</p>
+        <p className="text-sm text-muted">It may have been deleted or you don&apos;t have access.</p>
       </div>
     );
   if (state.status === 'error')
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
-        <p className="text-lg font-semibold text-red-400">{state.message}</p>
+        <p className="text-lg font-semibold text-red-600">{state.message}</p>
       </div>
     );
 
@@ -237,18 +237,18 @@ function TicketDetailInner() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="rounded-xl border border-white/10 bg-black/30 backdrop-blur p-6">
+      <div className="rounded-xl border border-line bg-surface backdrop-blur p-6">
         <div className="flex justify-between items-start gap-4">
           <div>
             <h1 className="text-2xl font-bold">{ticket.subject}</h1>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className={`text-sm capitalize ${statusStyles[ticket.status] ?? 'text-zinc-400'}`}>
+              <span className={`text-sm capitalize ${statusStyles[ticket.status] ?? 'text-muted'}`}>
                 {ticket.status.replace('_', ' ')}
               </span>
-              <span className="text-zinc-600">·</span>
+              <span className="text-muted">·</span>
               <span
                 className={`text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border capitalize ${
-                  priorityStyles[ticket.priority] ?? 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30'
+                  priorityStyles[ticket.priority] ?? 'bg-navy/5 text-muted border-navy/20'
                 }`}
               >
                 {ticket.priority}
@@ -264,7 +264,7 @@ function TicketDetailInner() {
             {role && permissions.canEditTicket(role, ticket.requester_id === user?.id) && !editMode && (
               <button
                 onClick={startEdit}
-                className="text-teal-400 text-sm border border-teal-500/30 rounded-md px-3 py-1.5 hover:bg-teal-500/10 transition-colors"
+                className="text-brand-dark text-sm border border-brand-dark/ rounded-md px-3 py-1.5 hover:bg-brand/15 transition-colors"
               >
                 Edit
               </button>
@@ -272,7 +272,7 @@ function TicketDetailInner() {
             {role && permissions.canDeleteTicket(role) && (
               <button
                 onClick={handleDelete}
-                className="text-red-400 text-sm border border-red-500/30 rounded-md px-3 py-1.5 hover:bg-red-500/10 transition-colors"
+                className="text-red-600 text-sm border border-red-500/30 rounded-md px-3 py-1.5 hover:bg-red-500/10 transition-colors"
               >
                 Delete ticket
               </button>
@@ -304,23 +304,23 @@ function TicketDetailInner() {
               <button
                 onClick={saveEdit}
                 disabled={editSaving}
-                className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-teal-400 disabled:opacity-50"
+                className="bg-brand text-on-brand font-semibold rounded-md px-4 py-2 text-sm transition-all hover:bg-brand-dark disabled:opacity-50"
               >
                 {editSaving ? 'Saving…' : 'Save changes'}
               </button>
               <button
                 onClick={() => setEditMode(false)}
-                className="text-sm text-zinc-400 hover:text-white px-4 py-2 rounded-md hover:bg-white/5 transition-colors"
+                className="text-sm text-muted hover:text-navy px-4 py-2 rounded-md hover:bg-navy/5 transition-colors"
               >
                 Cancel
               </button>
             </div>
           </div>
         ) : (
-          <p className="mt-4 text-zinc-200 whitespace-pre-wrap">{ticket.body}</p>
+          <p className="mt-4 text-navy whitespace-pre-wrap">{ticket.body}</p>
         )}
 
-        <div className="text-sm text-zinc-500 mt-4 pt-4 border-t border-white/10">
+        <div className="text-sm text-muted mt-4 pt-4 border-t border-line">
           Due {dueAt ? new Date(dueAt).toLocaleString() : '—'} · Requester:{' '}
           {ticket.requester ? ticket.requester.full_name : `#${ticket.requester_id}`} · Assignee:{' '}
           {ticket.assignee ? ticket.assignee.full_name : 'unassigned'}
@@ -330,13 +330,13 @@ function TicketDetailInner() {
           {(ticket.ticketTags || []).map((tt: any) => (
             <span
               key={tt.tag.id}
-              className="border border-teal-500/30 bg-teal-500/10 text-teal-400 rounded-full px-3 py-1 text-xs flex items-center gap-1.5"
+              className="border border-brand-dark/ bg-brand/15 text-brand-dark rounded-full px-3 py-1 text-xs flex items-center gap-1.5"
             >
               {tt.tag.name}
               {role && permissions.canManageTags(role) && (
                 <button
                   onClick={() => handleRemoveTag(tt.tag.id)}
-                  className="text-teal-300 hover:text-red-400 transition-colors"
+                  className="text-brand-dark hover:text-red-600 transition-colors"
                 >
                   ×
                 </button>
@@ -360,7 +360,7 @@ function TicketDetailInner() {
             />
             <button
               onClick={handleCreateTag}
-              className="border border-white/20 rounded-md px-3 py-2 text-sm hover:border-teal-400 transition-colors"
+              className="border border-line rounded-md px-3 py-2 text-sm hover:border-brand-dark transition-colors"
             >
               Create tag
             </button>
@@ -383,7 +383,7 @@ function TicketDetailInner() {
             </select>
             <button
               onClick={handleAddTag}
-              className="border border-white/20 rounded-md px-3 py-2 text-sm hover:border-teal-400 transition-colors"
+              className="border border-line rounded-md px-3 py-2 text-sm hover:border-brand-dark transition-colors"
             >
               Add tag
             </button>
@@ -391,8 +391,8 @@ function TicketDetailInner() {
         )}
 
         {role && permissions.canAssign(role) && (
-          <div className="mt-4 border-t border-white/10 pt-4">
-            <div className="text-xs font-semibold tracking-wide text-zinc-400 mb-2">
+          <div className="mt-4 border-t border-line pt-4">
+            <div className="text-xs font-semibold tracking-wide text-muted mb-2">
               Assign to (user ID)
             </div>
             {assignError && (
@@ -409,7 +409,7 @@ function TicketDetailInner() {
               />
               <button
                 onClick={handleAssign}
-                className="border border-white/20 rounded-md px-3 py-2 text-sm hover:border-teal-400 transition-colors"
+                className="border border-line rounded-md px-3 py-2 text-sm hover:border-brand-dark transition-colors"
               >
                 Assign
               </button>
@@ -429,7 +429,7 @@ function TicketDetailInner() {
         )}
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-black/30 backdrop-blur p-6 mt-6">
+      <div className="rounded-xl border border-line bg-surface backdrop-blur p-6 mt-6">
         <h2 className="text-lg font-bold mb-3">Comments</h2>
         <ul className="flex flex-col gap-3">
           {comments.map((c) => (
@@ -438,23 +438,23 @@ function TicketDetailInner() {
               className={`rounded-lg border p-3 ${
                 c.is_internal
                   ? 'border-amber-500/30 bg-amber-500/5'
-                  : 'border-white/10 bg-white/5'
+                  : 'border-line bg-navy/5'
               }`}
             >
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-500/20 text-[10px] font-bold text-teal-300">
+              <div className="flex items-center gap-2 text-xs text-muted">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/25 text-[10px] font-bold text-brand-dark">
                   {initials(people[c.author_id])}
                 </span>
-                <span className="text-zinc-300">{people[c.author_id] ?? `User #${c.author_id}`}</span>
+                <span className="text-navy">{people[c.author_id] ?? `User #${c.author_id}`}</span>
                 <span>·</span>
                 <span title={c.created_at}>{timeAgo(c.created_at)}</span>
                 {c.is_internal && (
-                  <span className="text-amber-400 font-semibold uppercase tracking-wide">
+                  <span className="text-amber-700 font-semibold uppercase tracking-wide">
                     Internal
                   </span>
                 )}
               </div>
-              <p className="text-sm text-zinc-200 mt-1">{c.body}</p>
+              <p className="text-sm text-navy mt-1">{c.body}</p>
             </li>
           ))}
         </ul>
@@ -473,10 +473,10 @@ function TicketDetailInner() {
             onChange={(e) => setCommentBody(e.target.value)}
           />
           {role && permissions.canWriteInternalComment(role) && (
-            <label className="flex items-center gap-2 text-sm text-zinc-300">
+            <label className="flex items-center gap-2 text-sm text-navy">
               <input
                 type="checkbox"
-                className="accent-teal-500 h-4 w-4"
+                className="accent-brand-dark h-4 w-4"
                 checked={commentInternal}
                 onChange={(e) => setCommentInternal(e.target.checked)}
               />
@@ -484,7 +484,7 @@ function TicketDetailInner() {
             </label>
           )}
           <button
-            className="bg-teal-500 text-black font-semibold rounded-md px-4 py-2 text-sm self-start transition-all hover:bg-teal-400 hover:scale-[1.02] active:scale-[0.98]"
+            className="bg-brand text-on-brand font-semibold rounded-md px-4 py-2 text-sm self-start transition-all hover:bg-brand-dark hover:scale-[1.02] active:scale-[0.98]"
             type="submit"
           >
             Post comment
@@ -492,7 +492,7 @@ function TicketDetailInner() {
         </form>
       </div>
 
-      <div className="rounded-xl border border-white/10 bg-black/30 backdrop-blur p-6 mt-6">
+      <div className="rounded-xl border border-line bg-surface backdrop-blur p-6 mt-6">
         <h2 className="text-lg font-bold mb-3">History</h2>
         <ul className="flex flex-col gap-2">
           {[...events].reverse().map((e) => {
@@ -500,8 +500,8 @@ function TicketDetailInner() {
               ? `Status changed from ${e.from_status} to ${e.to_status}${e.note ? ` — ${e.note}` : ''}`
               : e.note || 'Ticket updated';
             return (
-              <li key={e.id} className="text-sm text-zinc-400 border-l-2 border-teal-500/30 pl-3">
-                {sentence} <span className="text-zinc-600">· {timeAgo(e.created_at)}</span>
+              <li key={e.id} className="text-sm text-muted border-l-2 border-brand-dark/ pl-3">
+                {sentence} <span className="text-muted">· {timeAgo(e.created_at)}</span>
               </li>
             );
           })}

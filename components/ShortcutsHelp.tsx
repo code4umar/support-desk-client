@@ -31,19 +31,19 @@ export default function ShortcutsHelp() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-navy/40 px-4 backdrop-blur-sm"
       onClick={() => setOpen(false)}
     >
       <div
-        className="w-full max-w-sm rounded-xl border border-white/10 bg-zinc-950 p-5 shadow-2xl"
+        className="w-full max-w-sm rounded-xl border border-line bg-surface p-5 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-3 text-lg font-bold">Keyboard shortcuts</h2>
         <ul className="space-y-2">
           {ROWS.map(([k, d]) => (
             <li key={k} className="flex items-center justify-between text-sm">
-              <span className="text-zinc-300">{d}</span>
-              <kbd className="rounded border border-white/20 bg-white/5 px-2 py-0.5 text-xs text-teal-300">
+              <span className="text-navy">{d}</span>
+              <kbd className="rounded border border-line bg-navy/5 px-2 py-0.5 text-xs text-brand-dark">
                 {k}
               </kbd>
             </li>

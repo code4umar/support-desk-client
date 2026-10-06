@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 
 const inputClass =
-  'border border-white/20 bg-black/30 rounded-md px-3 py-2 text-sm outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400/50 transition-colors [color-scheme:dark]';
+  'border border-line bg-surface rounded-md px-3 py-2 text-sm outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand/50 transition-colors [color-scheme:light]';
 
 const FILTER_KEYS = ['q', 'status', 'priority', 'tag', 'assigneeId', 'overdue'];
 
@@ -84,7 +84,7 @@ export default function TicketFilters({
   }
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/40 backdrop-blur p-4 mb-6">
+    <div className="rounded-xl border border-line bg-surface backdrop-blur p-4 mb-6">
       {/* Saved views */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         {presets.map((p) => {
@@ -96,8 +96,8 @@ export default function TicketFilters({
               onClick={() => applyPreset(p)}
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 active
-                  ? 'border-teal-400 bg-teal-500/15 text-teal-300'
-                  : 'border-white/10 text-zinc-400 hover:border-teal-400/60 hover:text-white'
+                  ? 'border-brand-dark bg-teal-500/15 text-brand-dark'
+                  : 'border-line text-muted hover:border-brand-dark/60 hover:text-navy'
               }`}
             >
               {p.label}
@@ -108,7 +108,7 @@ export default function TicketFilters({
           <button
             type="button"
             onClick={clearAll}
-            className="ml-auto text-xs text-zinc-500 hover:text-red-400 transition-colors"
+            className="ml-auto text-xs text-muted hover:text-red-600 transition-colors"
           >
             Clear filters
           </button>
@@ -167,10 +167,10 @@ export default function TicketFilters({
           value={searchParams.get('assigneeId') ?? ''}
           onChange={(e) => onChange('assigneeId', e.target.value || null)}
         />
-        <label className="flex items-center gap-2 text-sm text-zinc-300 px-2">
+        <label className="flex items-center gap-2 text-sm text-navy px-2">
           <input
             type="checkbox"
-            className="accent-teal-500 h-4 w-4"
+            className="accent-brand-dark h-4 w-4"
             checked={searchParams.get('overdue') === 'true'}
             onChange={(e) => onChange('overdue', e.target.checked ? 'true' : null)}
           />
