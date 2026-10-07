@@ -20,7 +20,7 @@ export default function RoleWelcome() {
         ];
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-dark/20 bg-brand/10 px-5 py-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-dark/20 bg-teal-500/[0.04] px-5 py-4">
       <div>
         <p className="font-semibold">Welcome back, {user.name}</p>
         <p className="text-xs capitalize text-muted">

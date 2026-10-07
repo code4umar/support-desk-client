@@ -144,7 +144,7 @@ export default function CommandPalette() {
                 onMouseEnter={() => setActive(i)}
                 onClick={() => go(it)}
                 className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm ${
-                  i === active ? 'bg-brand/15 text-brand-dark' : 'text-navy'
+                  i === active ? 'bg-teal-500/15 text-brand-dark' : 'text-navy'
                 }`}
               >
                 <span className="truncate">{it.label}</span>

@@ -19,16 +19,16 @@ type State =
   | { status: 'ready'; data: Envelope<Ticket> };
 
 const priorityStyles: Record<string, string> = {
-  low: 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/30',
-  normal: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
-  high: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
-  urgent: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+  low: 'bg-sky-500/10 text-sky-700 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 const statusStyles: Record<string, string> = {
   open: 'text-brand-dark',
-  in_progress: 'text-amber-700 dark:text-amber-400',
-  resolved: 'text-green-700 dark:text-green-400',
+  in_progress: 'text-amber-700',
+  resolved: 'text-green-700',
   closed: 'text-muted',
 };
 
@@ -377,7 +377,7 @@ function TicketsPageInner() {
                     <button
                       onClick={bulkDelete}
                       disabled={busy}
-                      className="rounded-md border border-red-500/30 px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-500/10 disabled:opacity-50"
+                      className="rounded-md border border-red-500/30 px-3 py-1.5 text-sm text-red-600 hover:bg-red-500/10 disabled:opacity-50"
                     >
                       Delete
                     </button>

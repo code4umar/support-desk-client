@@ -2,7 +2,6 @@
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
-import NotificationBell from './NotificationBell';
 
 export default function Header() {
   const { user, loading, logout } = useAuth();
@@ -40,8 +39,6 @@ export default function Header() {
                 Dashboard
               </Link>
             </nav>
-
-            <NotificationBell />
 
             <ThemeToggle />
 

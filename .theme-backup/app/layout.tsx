@@ -28,16 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={outfit.variable} suppressHydrationWarning>
-      <head>
-        {/* set theme before first paint: saved choice, else the OS preference */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t}catch(e){}",
-          }}
-        />
-      </head>
+    <html lang="en" className={outfit.variable}>
       <body>
         <ToastProvider>
           <AuthProvider>

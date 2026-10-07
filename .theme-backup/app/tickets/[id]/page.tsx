@@ -18,16 +18,16 @@ type State =
   | { status: 'ready'; ticket: any };
 
 const priorityStyles: Record<string, string> = {
-  low: 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/30',
-  normal: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
-  high: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
-  urgent: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+  low: 'bg-sky-500/10 text-sky-700 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 const statusStyles: Record<string, string> = {
   open: 'text-brand-dark',
-  in_progress: 'text-amber-700 dark:text-amber-400',
-  resolved: 'text-green-700 dark:text-green-400',
+  in_progress: 'text-amber-700',
+  resolved: 'text-green-700',
   closed: 'text-muted',
 };
 
@@ -109,7 +109,7 @@ function TicketDetailInner() {
   if (state.status === 'error')
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
-        <p className="text-lg font-semibold text-red-600 dark:text-red-400">{state.message}</p>
+        <p className="text-lg font-semibold text-red-600">{state.message}</p>
       </div>
     );
 
@@ -272,7 +272,7 @@ function TicketDetailInner() {
             {role && permissions.canDeleteTicket(role) && (
               <button
                 onClick={handleDelete}
-                className="text-red-600 dark:text-red-400 text-sm border border-red-500/30 rounded-md px-3 py-1.5 hover:bg-red-500/10 transition-colors"
+                className="text-red-600 text-sm border border-red-500/30 rounded-md px-3 py-1.5 hover:bg-red-500/10 transition-colors"
               >
                 Delete ticket
               </button>
@@ -449,7 +449,7 @@ function TicketDetailInner() {
                 <span>·</span>
                 <span title={c.created_at}>{timeAgo(c.created_at)}</span>
                 {c.is_internal && (
-                  <span className="text-amber-700 dark:text-amber-400 font-semibold uppercase tracking-wide">
+                  <span className="text-amber-700 font-semibold uppercase tracking-wide">
                     Internal
                   </span>
                 )}

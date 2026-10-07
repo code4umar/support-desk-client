@@ -1,0 +1,4 @@
+[
+  "components/NotificationBell.tsx",
+  "__tests__/notifications.test.tsx"
+]

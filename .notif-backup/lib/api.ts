@@ -104,13 +104,6 @@ export const api = {
 
   getEvents: (id: string) => request<any[]>(`/tickets/${id}/events`),
 
-  getNotifications: (limit = 20) =>
-    request<{ unread: number; items: any[] }>(`/notifications?limit=${limit}`),
-  markNotificationRead: (id: number) =>
-    request<any>(`/notifications/${id}/read`, { method: 'PATCH' }),
-  markAllNotificationsRead: () =>
-    request<{ updated: number }>('/notifications/read-all', { method: 'PATCH' }),
-
   getTags: () => request<any[]>('/tags'),
   createTag: (name: string) =>
     request<any>('/tags', { method: 'POST', body: JSON.stringify({ name }) }),

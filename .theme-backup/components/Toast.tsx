@@ -29,7 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className={`animate-fade-slide-up rounded-md border px-4 py-3 text-sm font-medium shadow-lg backdrop-blur ${
               t.type === 'success'
                 ? 'border-brand-dark/30 bg-brand/15 text-brand-dark'
-                : 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400'
+                : 'border-red-500/30 bg-red-500/10 text-red-600'
             }`}
           >
             {t.message}

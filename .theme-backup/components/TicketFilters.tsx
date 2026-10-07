@@ -96,7 +96,7 @@ export default function TicketFilters({
               onClick={() => applyPreset(p)}
               className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                 active
-                  ? 'border-brand-dark bg-brand/15 text-brand-dark'
+                  ? 'border-brand-dark bg-teal-500/15 text-brand-dark'
                   : 'border-line text-muted hover:border-brand-dark/60 hover:text-navy'
               }`}
             >

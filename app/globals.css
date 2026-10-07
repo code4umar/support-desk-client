@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* Coding Pixel inspired theme: light grey-blue, navy text, turquoise accent */
 :root {
@@ -99,3 +100,25 @@ select.field option { background: #ffffff; color: #213558; }
 /* Dropdowns follow the light theme */
 select { color-scheme: light; }
 select option { background-color: #fff; color: #213558; }
+/* Dark theme: deep navy surfaces, same turquoise accent */
+:root[data-theme="dark"] {
+  --background: #121a2b;
+  --foreground: #f1f5fb;
+  --bg: #121a2b;
+  --card: #1a2438;
+  --border: #2b3752;
+  --text: #f1f5fb;
+  --muted: #94a3bd;
+  --accent: #2ee6d6;
+  --accent-dark: #5eeee2;
+  --on-accent: #0f1726;
+  color-scheme: dark;
+}
+
+/* status/priority colours: brighter on dark */
+:root[data-theme="dark"] .prio-low    { color: #7dd3fc; border-color: #7dd3fc55; background: #7dd3fc14; }
+:root[data-theme="dark"] .prio-normal { color: #a5b4fc; border-color: #a5b4fc55; background: #a5b4fc14; }
+:root[data-theme="dark"] .prio-high   { color: #fbbf24; border-color: #fbbf2455; background: #fbbf2414; }
+:root[data-theme="dark"] .prio-urgent { color: #f87171; border-color: #f8717155; background: #f8717114; }
+:root[data-theme="dark"] .status-in_progress { color: #fbbf24; }
+:root[data-theme="dark"] .status-resolved    { color: #4ade80; }

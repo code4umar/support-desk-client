@@ -1,8 +1,6 @@
 'use client';
 import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
-import ThemeToggle from './ThemeToggle';
-import NotificationBell from './NotificationBell';
 
 export default function Header() {
   const { user, loading, logout } = useAuth();
@@ -41,11 +39,6 @@ export default function Header() {
               </Link>
             </nav>
 
-            <NotificationBell />
-
-            <ThemeToggle />
-
-
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-line bg-navy/5 px-3 py-1.5">
               <span className="h-2 w-2 rounded-full bg-brand" />
               <span className="text-sm font-medium text-navy">{user.name}</span>
@@ -62,7 +55,6 @@ export default function Header() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <Link
               href="/login"
               className="text-sm font-medium text-navy hover:text-navy transition-colors px-4 py-2 rounded-md hover:bg-navy/5"

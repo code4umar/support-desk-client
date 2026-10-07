@@ -33,10 +33,10 @@ const prioColor: Record<string, string> = {
   urgent: 'bg-red-400',
 };
 const priorityStyles: Record<string, string> = {
-  low: 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/30',
-  normal: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
-  high: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
-  urgent: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+  low: 'bg-sky-500/10 text-sky-700 border-sky-500/30',
+  normal: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/30',
+  high: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+  urgent: 'bg-red-500/10 text-red-600 border-red-500/30',
 };
 
 const pick = (res: any): Ticket[] =>
@@ -182,7 +182,7 @@ function DashboardInner() {
     };
   }, [tickets]);
 
-  if (error) return <p className="text-red-600 dark:text-red-400">{error}</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
   if (!tickets) return <DashboardSkeleton />;
 
   return (
@@ -196,17 +196,17 @@ function DashboardInner() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         <Stat label="Total tickets" value={stats.total} href="/tickets" />
         <Stat label="Open" value={stats.byStatus.open} tone="text-brand-dark" href="/tickets?status=open" />
-        <Stat label="In progress" value={stats.byStatus.in_progress} tone="text-amber-700 dark:text-amber-400" href="/tickets?status=in_progress" />
+        <Stat label="In progress" value={stats.byStatus.in_progress} tone="text-amber-700" href="/tickets?status=in_progress" />
         <Stat
           label="Overdue (SLA)"
           value={stats.overdue}
-          tone={stats.overdue ? 'text-red-600 dark:text-red-400' : 'text-navy'}
+          tone={stats.overdue ? 'text-red-600' : 'text-navy'}
           href="/tickets?overdue=true&sortBy=dueAt&order=asc"
         />
         <Stat
           label="Resolved / closed"
           value={stats.byStatus.resolved + stats.byStatus.closed}
-          tone="text-green-700 dark:text-green-400"
+          tone="text-green-700"
           href="/tickets?status=resolved"
         />
       </div>
@@ -217,7 +217,7 @@ function DashboardInner() {
           <h2 className="text-sm font-semibold text-navy">
             Needs attention{' '}
             {stats.attentionTotal > 0 && (
-              <span className="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-600 dark:text-red-400">
+              <span className="ml-1 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-600">
                 {stats.attentionTotal}
               </span>
             )}

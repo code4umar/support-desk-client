@@ -50,7 +50,7 @@ export default function TrendChart({
               {d.count}
             </div>
             <div
-              className="w-full rounded-t bg-brand/80 transition-all group-hover:bg-brand-dark"
+              className="w-full rounded-t bg-teal-400/80 transition-all group-hover:bg-teal-300"
               style={{ height: `${(d.count / max) * 100}%`, minHeight: d.count ? 4 : 2, opacity: d.count ? 1 : 0.25 }}
             />
           </div>
