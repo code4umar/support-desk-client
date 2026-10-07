@@ -246,7 +246,13 @@ function TicketsPageInner() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="relative rounded-xl border border-brand-dark/ bg-gradient-to-br from-navy via-white to-brand/25 p-5 mb-6 overflow-hidden">
+            <div
+        className="relative rounded-xl border border-brand-dark/30 p-5 mb-6 overflow-hidden"
+        style={{
+          background:
+            'linear-gradient(135deg, var(--card) 0%, var(--card) 55%, color-mix(in srgb, var(--accent) 28%, var(--card)) 100%)',
+        }}
+      >
         <div className="pointer-events-none absolute -top-10 -right-10 h-48 w-48 rounded-full bg-brand/40 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-indigo-500/15 blur-3xl" />
         <div className="relative flex items-center justify-between gap-3">
@@ -455,7 +461,7 @@ export default function TicketsPage() {
       <Suspense
         fallback={
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-xl border border-brand-dark/ bg-gradient-to-br from-navy via-white to-brand/25 p-5 mb-6 h-[88px] animate-pulse" />
+                        <div className="rounded-xl border border-brand-dark/30 bg-surface p-5 mb-6 h-[88px] animate-pulse" />
             <div className="rounded-xl border border-line bg-surface p-4 mb-6 h-[76px] animate-pulse" />
             <ListSkeleton />
           </div>
