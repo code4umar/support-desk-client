@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
 import { ToastProvider } from "@/components/Toast";
 import Header from "@/components/Header";
+import SplashScreen from "@/components/SplashScreen";
 import Shortcuts from "@/components/Shortcuts";
 import CommandPalette from "@/components/CommandPalette";
 import ShortcutsHelp from "@/components/ShortcutsHelp";
@@ -39,6 +40,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <SplashScreen />
         <ToastProvider>
           <AuthProvider>
             <Header />

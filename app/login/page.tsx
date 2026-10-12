@@ -89,7 +89,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [capsOn, setCapsOn] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [success, setSuccess] = useState(false);
   const [count, setCount] = useState(0);
   const [stats, setStats] = useState<PublicStats | null>(null);
 
@@ -183,9 +182,7 @@ export default function LoginPage() {
         if (remember) localStorage.setItem('deskly_email', trimmedEmail);
         else localStorage.removeItem('deskly_email');
       } catch {}
-      setSuccess(true);
-      await new Promise((r) => setTimeout(r, 900));
-      router.push('/dashboard');
+            router.push('/dashboard');
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 401) {
         setError('Invalid email or password');
@@ -272,6 +269,14 @@ export default function LoginPage() {
             <div className="glow pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#1fe5d8]/25 blur-3xl" />
 
             <div className="relative flex flex-1 flex-col justify-center px-8 py-10 sm:px-10">
+              <div className="mb-6 md:absolute md:left-10 md:top-6 md:mb-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/coding-pixel-icon.svg"
+                  alt="Coding Pixel"
+                  className="h-12 w-auto drop-shadow-[0_0_14px_rgba(46,230,214,0.35)]"
+                />
+              </div>
               <h1
                 className={`${heading.className} rise text-4xl font-semibold tracking-tight text-white`}
                 style={{ animationDelay: '0.1s' }}
@@ -410,18 +415,6 @@ export default function LoginPage() {
               </Link>
             </div>
           </div>
-
-          {/* Success overlay */}
-          {success && (
-            <div className="rise absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-[#162540]/95 backdrop-blur-sm">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#7df5ec] to-[#1fe5d8]">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#162540]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path className="draw" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <p className="text-sm font-medium text-white">Signed in. Opening your dashboard…</p>
-            </div>
-          )}
 
           {/* Mouse spotlight */}
           <div
