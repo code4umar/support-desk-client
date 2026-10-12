@@ -76,6 +76,14 @@ const labelClass =
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function formatDuration(min: number): string {
+  if (min < 60) return `${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h`;
+  const d = Math.round(h / 24);
+  return `${d} day${d === 1 ? '' : 's'}`;
+}
+
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
@@ -182,7 +190,7 @@ export default function LoginPage() {
         if (remember) localStorage.setItem('deskly_email', trimmedEmail);
         else localStorage.removeItem('deskly_email');
       } catch {}
-            router.push('/dashboard');
+      router.push('/dashboard');
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 401) {
         setError('Invalid email or password');
@@ -226,17 +234,15 @@ export default function LoginPage() {
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#162540]/60 via-transparent to-transparent" />
 
-            {/* Live counter */}
-            {stats && (
-              <div className="rise absolute left-6 top-6" style={{ animationDelay: '0.2s' }}>
-                <div className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
-                  <p className={`${heading.className} text-3xl font-bold tabular-nums text-white`}>
-                    {count.toLocaleString('en-US')}
-                  </p>
-                  <p className="text-[11px] text-white/60">tickets resolved this week</p>
-                </div>
-              </div>
-            )}
+            {/* Logo (top-left of the picture) */}
+            <div className="rise absolute left-6 top-6" style={{ animationDelay: '0.1s' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/coding-pixel-icon.svg"
+                alt=""
+                className="h-12 w-auto drop-shadow-[0_0_14px_rgba(46,230,214,0.35)]"
+              />
+            </div>
 
             {/* Floating ticket card */}
             {stats?.latestResolved && (
@@ -255,7 +261,7 @@ export default function LoginPage() {
                         ? `Closed by ${stats.latestResolved.closedBy}`
                         : 'Recently resolved'}
                       {stats.latestResolved.minutes != null
-                        ? ` in ${stats.latestResolved.minutes} min`
+                        ? ` in ${formatDuration(stats.latestResolved.minutes)}`
                         : ''}
                     </p>
                   </div>
@@ -268,8 +274,21 @@ export default function LoginPage() {
           <div className="relative flex w-full shrink-0 flex-col overflow-hidden md:w-[420px]">
             <div className="glow pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#1fe5d8]/25 blur-3xl" />
 
+            {/* Live counter (top-right corner of the form side) */}
+            {stats && (
+              <div className="rise absolute right-5 top-5 z-10 hidden md:block" style={{ animationDelay: '0.2s' }}>
+                <div className="rounded-xl border border-white/15 bg-white/10 px-3.5 py-2 text-right backdrop-blur-md">
+                  <p className={`${heading.className} text-2xl font-bold leading-none tabular-nums text-white`}>
+                    {count.toLocaleString('en-US')}
+                  </p>
+                  <p className="mt-1 text-[10px] text-white/60">resolved this week</p>
+                </div>
+              </div>
+            )}
+
             <div className="relative flex flex-1 flex-col justify-center px-8 py-10 sm:px-10">
-              <div className="mb-6 md:absolute md:left-10 md:top-6 md:mb-0">
+              {/* Logo for phones only (the picture side is hidden there) */}
+              <div className="mb-6 md:hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/coding-pixel-icon.svg"
