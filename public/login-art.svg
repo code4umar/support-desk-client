@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1160" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10245a"/><stop offset=".55" stop-color="#0a1433"/><stop offset="1" stop-color="#060b1f"/>
+    </linearGradient>
+    <radialGradient id="gTeal" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#1fe5d8" stop-opacity=".55"/><stop offset="1" stop-color="#1fe5d8" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gViolet" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7c5cff" stop-opacity=".5"/><stop offset="1" stop-color="#7c5cff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="gWarm" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff9d6c" stop-opacity=".30"/><stop offset="1" stop-color="#ff9d6c" stop-opacity="0"/></radialGradient>
+    <linearGradient id="brk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9fbcff"/></linearGradient>
+    <linearGradient id="slash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8bfff4"/><stop offset=".55" stop-color="#1fe5d8"/><stop offset="1" stop-color="#18a9ff"/></linearGradient>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c5cff" stop-opacity="0"/><stop offset=".5" stop-color="#9fb6ff" stop-opacity=".7"/><stop offset="1" stop-color="#1fe5d8" stop-opacity="0"/></linearGradient>
+    <linearGradient id="fadeDown" x1="0" y1="0" x2="0" y2="1"><stop offset=".62" stop-color="#060b1f" stop-opacity="0"/><stop offset="1" stop-color="#060b1f" stop-opacity=".92"/></linearGradient>
+    <filter id="blur60" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="60"/></filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="16" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9"/></filter>
+    <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.5" fill="#a9bcff" opacity=".42"/></pattern>
+    <radialGradient id="dotFadeG" cx=".5" cy=".46" r=".62"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient>
+    <mask id="dotMask"><rect width="720" height="1160" fill="url(#dotFadeG)"/></mask>
+  </defs>
+
+  <rect width="720" height="1160" fill="url(#bg)"/>
+
+  <!-- colour fields -->
+  <g filter="url(#blur60)">
+    <circle cx="520" cy="330" r="300" fill="url(#gTeal)"/>
+    <circle cx="140" cy="800" r="340" fill="url(#gViolet)"/>
+    <circle cx="610" cy="980" r="260" fill="url(#gWarm)"/>
+  </g>
+
+  <!-- fine dot grid, fading out from the centre -->
+  <rect width="720" height="1160" fill="url(#dots)" mask="url(#dotMask)"/>
+
+  <!-- orbits -->
+  <g transform="translate(360 540) rotate(-24)" fill="none">
+    <ellipse rx="338" ry="128" stroke="url(#orbit)" stroke-width="1.6"/>
+    <ellipse rx="262" ry="96"  stroke="#9fb6ff" stroke-opacity=".28" stroke-width="1.2" stroke-dasharray="3 9"/>
+    <ellipse rx="410" ry="170" stroke="#7c5cff" stroke-opacity=".18" stroke-width="1.2"/>
+    <circle cx="338" cy="0" r="7" fill="#1fe5d8" filter="url(#glow)"/>
+    <circle cx="-262" cy="0" r="5" fill="#ffb27d" filter="url(#glow)"/>
+    <circle cx="120" cy="-122" r="4" fill="#fff" opacity=".9"/>
+    <circle cx="-200" cy="62" r="3.5" fill="#9fb6ff"/>
+  </g>
+
+  <!-- the mark: depth layers, then the bracket pair and the glowing slash -->
+  <g transform="translate(360 540) scale(.84) translate(-330.5 -231)">
+    <g fill="none" stroke="#7c5cff" stroke-opacity=".55" stroke-width="3" transform="translate(-34 30)">
+      <path d="M294,92 L49,138 L6,242 L157,444 L201,358 L103,223 L269,181Z"/>
+      <path d="M508,18 L462,103 L560,237 L392,281 L368,369 L614,323 L655,216Z"/>
+    </g>
+    <g fill="none" stroke="#1fe5d8" stroke-opacity=".4" stroke-width="3" transform="translate(30 -26)">
+      <path d="M294,92 L49,138 L6,242 L157,444 L201,358 L103,223 L269,181Z"/>
+      <path d="M508,18 L462,103 L560,237 L392,281 L368,369 L614,323 L655,216Z"/>
+    </g>
+    <g filter="url(#soft)" opacity=".5" transform="translate(0 26)" fill="#000">
+      <path d="M294,92 L49,138 L6,242 L157,444 L201,358 L103,223 L269,181Z"/>
+      <path d="M508,18 L462,103 L560,237 L392,281 L368,369 L614,323 L655,216Z"/>
+    </g>
+    <path fill="url(#brk)" d="M294,92 L49,138 L6,242 L157,444 L201,358 L103,223 L269,181Z"/>
+    <path fill="url(#brk)" d="M508,18 L462,103 L560,237 L392,281 L368,369 L614,323 L655,216Z"/>
+    <path fill="url(#slash)" filter="url(#glow)" d="M456,6 L376,11 L207,456 L291,447Z"/>
+  </g>
+
+  <!-- floating glass icons (support, resolved, fast) -->
+  <g stroke="#e8f0ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <g transform="translate(86 262)">
+      <rect width="72" height="72" rx="22" fill="#ffffff" fill-opacity=".08" stroke-opacity=".28"/>
+      <path d="M22 26h28a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H36l-8 7v-7h-6a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4z"/>
+    </g>
+    <g transform="translate(570 760)">
+      <rect width="72" height="72" rx="22" fill="#ffffff" fill-opacity=".08" stroke-opacity=".28"/>
+      <circle cx="36" cy="36" r="14" stroke="#2ee6d6"/><path d="M29 36.5l5 5 9-10" stroke="#2ee6d6"/>
+    </g>
+    <g transform="translate(112 842)">
+      <rect width="64" height="64" rx="20" fill="#ffffff" fill-opacity=".08" stroke-opacity=".28"/>
+      <path d="M35 17L22 36h9l-2 12 13-19h-9z" stroke="#ffb27d"/>
+    </g>
+  </g>
+
+  <!-- sparkles -->
+  <g fill="#fff">
+    <path d="M600 230l4 11 11 4-11 4-4 11-4-11-11-4 11-4z" opacity=".85"/>
+    <path d="M70 600l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" opacity=".6"/>
+    <circle cx="640" cy="520" r="2.5" opacity=".7"/><circle cx="210" cy="140" r="2" opacity=".6"/><circle cx="520" cy="1000" r="2" opacity=".5"/>
+  </g>
+
+  <rect width="720" height="1160" fill="url(#fadeDown)"/>
+</svg>

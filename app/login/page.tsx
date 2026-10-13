@@ -17,7 +17,7 @@ const body = DM_Sans({
 });
 
 // public/Image.svg (naam mein capital I hai)
-const LOGIN_IMAGE = '/Image.svg';
+const LOGIN_IMAGE = '/login-art.svg';
 
 // Demo account (sirf development mein button dikhega)
 const DEMO_EMAIL = 'admin@supportdesk.test';
@@ -242,6 +242,14 @@ export default function LoginPage() {
                 alt=""
                 className="h-12 w-auto drop-shadow-[0_0_14px_rgba(46,230,214,0.35)]"
               />
+            </div>
+
+            {/* deskly-brand-text: wordmark under the artwork */}
+            <div className="rise pointer-events-none absolute inset-x-0 bottom-32 px-8 text-center" style={{ animationDelay: '0.25s' }}>
+              <p className={`${heading.className} text-4xl font-bold tracking-tight text-white`}>
+                Desk<span className="text-[#2ee6d6]">ly</span>
+              </p>
+              <p className="mt-2 text-sm text-white/65">Every request, resolved.</p>
             </div>
 
             {/* Floating ticket card */}
