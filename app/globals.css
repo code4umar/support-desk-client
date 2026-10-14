@@ -128,11 +128,11 @@ select option { background-color: #fff; color: #213558; }
   position: fixed; inset: 0; z-index: 9999;
   display: flex; align-items: center; justify-content: center;
   background: var(--background);
-  animation: splash-bg 2.2s ease-in forwards;
+  animation: splash-bg 1.5s ease-in forwards;
 }
 .deskly-splash-logo {
   width: clamp(110px, 14vw, 170px); height: auto; overflow: visible;
-  animation: splash-zoom 2.2s linear forwards;
+  animation: splash-zoom 1.5s linear forwards;
   will-change: transform, opacity;
 }
 .deskly-splash-logo path { opacity: 0; animation-duration: .7s; animation-fill-mode: both; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
