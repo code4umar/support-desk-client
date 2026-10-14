@@ -74,6 +74,18 @@ export const api = {
       true
     ),
   me: () => request<any>('/auth/me'),
+    forgotPassword: (email: string) =>
+    request<{ message: string }>(
+      '/auth/forgot-password',
+      { method: 'POST', body: JSON.stringify({ email }) },
+      true
+    ),
+  resetPassword: (token: string, password: string) =>
+    request<{ message: string }>(
+      '/auth/reset-password',
+      { method: 'POST', body: JSON.stringify({ token, password }) },
+      true
+    ),
 
   getTickets: (query: string) => request<any>(`/tickets?${query}`),
   getTicket: (id: string) => request<any>(`/tickets/${id}`),
