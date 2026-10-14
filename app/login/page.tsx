@@ -204,7 +204,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className={`${body.className} flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-6 [perspective:1200px]`}
+      className={`${body.className} flex min-h-[calc(100dvh-97px)] items-center justify-center px-4 py-4 [perspective:1200px]`}
     >
       <style>{css}</style>
 
@@ -213,7 +213,7 @@ export default function LoginPage() {
         ref={outerRef}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        className="flow flex h-[calc(100vh-8rem)] min-h-[560px] w-full max-w-4xl rounded-2xl p-px shadow-2xl shadow-black/50 will-change-transform"
+        className="flow flex h-[calc(100dvh-129px)] min-h-[460px] max-h-[760px] w-full max-w-4xl rounded-2xl p-px shadow-2xl shadow-black/50 will-change-transform"
         style={{
           background:
             'linear-gradient(110deg, #1fe5d888, #ffffff10, #7df5ec66, #ffffff10, #1fe5d888)',
@@ -245,7 +245,7 @@ export default function LoginPage() {
             </div>
 
             {/* deskly-brand-text: wordmark under the artwork */}
-            <div className="rise pointer-events-none absolute inset-x-0 bottom-32 px-8 text-center" style={{ animationDelay: '0.25s' }}>
+            <div className="rise pointer-events-none absolute inset-x-0 bottom-24 px-8 text-center" style={{ animationDelay: '0.25s' }}>
               <p className={`${heading.className} text-4xl font-bold tracking-tight text-white`}>
                 Desk<span className="text-[#2ee6d6]">ly</span>
               </p>
@@ -284,17 +284,17 @@ export default function LoginPage() {
 
             {/* Live counter (top-right corner of the form side) */}
             {stats && (
-              <div className="rise absolute right-5 top-5 z-10 hidden md:block" style={{ animationDelay: '0.2s' }}>
-                <div className="rounded-xl border border-white/15 bg-white/10 px-3.5 py-2 text-right backdrop-blur-md">
-                  <p className={`${heading.className} text-2xl font-bold leading-none tabular-nums text-white`}>
+              <div className="rise absolute right-4 top-4 z-10 hidden md:block [@media(max-height:640px)]:hidden" style={{ animationDelay: '0.2s' }}>
+                <div className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">
+                  <p className={`${heading.className} text-base font-bold leading-none tabular-nums text-white`}>
                     {count.toLocaleString('en-US')}
                   </p>
-                  <p className="mt-1 text-[10px] text-white/60">resolved this week</p>
+                  <p className="text-[11px] leading-none text-white/60">resolved this week</p>
                 </div>
               </div>
             )}
 
-            <div className="relative flex flex-1 flex-col justify-center px-8 py-10 sm:px-10">
+            <div className="relative flex flex-1 flex-col justify-center px-8 py-10 sm:px-10 [@media(max-height:640px)]:py-5">
               {/* Logo for phones only (the picture side is hidden there) */}
               <div className="mb-6 md:hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

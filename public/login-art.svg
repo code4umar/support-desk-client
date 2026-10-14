@@ -62,7 +62,7 @@
 
   <!-- floating glass icons (support, resolved, fast) -->
   <g stroke="#e8f0ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <g transform="translate(86 262)">
+    <g transform="translate(66 372)">
       <rect width="72" height="72" rx="22" fill="#ffffff" fill-opacity=".08" stroke-opacity=".28"/>
       <path d="M22 26h28a4 4 0 0 1 4 4v12a4 4 0 0 1-4 4H36l-8 7v-7h-6a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4z"/>
     </g>
@@ -70,7 +70,7 @@
       <rect width="72" height="72" rx="22" fill="#ffffff" fill-opacity=".08" stroke-opacity=".28"/>
       <circle cx="36" cy="36" r="14" stroke="#2ee6d6"/><path d="M29 36.5l5 5 9-10" stroke="#2ee6d6"/>
     </g>
-    <g transform="translate(112 842)">
+    <g transform="translate(578 252)">
       <rect width="64" height="64" rx="20" fill="#ffffff" fill-opacity=".08" stroke-opacity=".28"/>
       <path d="M35 17L22 36h9l-2 12 13-19h-9z" stroke="#ffb27d"/>
     </g>
@@ -78,7 +78,7 @@
 
   <!-- sparkles -->
   <g fill="#fff">
-    <path d="M600 230l4 11 11 4-11 4-4 11-4-11-11-4 11-4z" opacity=".85"/>
+    <path d="M512 196l4 11 11 4-11 4-4 11-4-11-11-4 11-4z" opacity=".85"/>
     <path d="M70 600l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" opacity=".6"/>
     <circle cx="640" cy="520" r="2.5" opacity=".7"/><circle cx="210" cy="140" r="2" opacity=".6"/><circle cx="520" cy="1000" r="2" opacity=".5"/>
   </g>
