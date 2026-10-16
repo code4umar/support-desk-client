@@ -10,6 +10,9 @@ import { timeAgo, slaInfo, initials } from '@/lib/time';
 import StatusControl from '@/components/StatusControl';
 import RequireAuth from '@/components/RequireAuth';
 import type { TicketStatus } from '@/lib/transitions';
+import RatingStars from '@/components/RatingStars';
+import StaffSelect from '@/components/StaffSelect';
+import SuggestReply from '@/components/SuggestReply';
 
 type State =
   | { status: 'loading' }
@@ -74,7 +77,8 @@ function TicketDetailInner() {
     api.getComments(id).then(setComments).catch(() => {});
     api.getEvents(id).then(setEvents).catch(() => {});
   }
-    useEffect(() => {
+
+  useEffect(() => {
     const timer = setTimeout(() => setMinTimeDone(true), 1000);
     return () => clearTimeout(timer);
   }, []);
@@ -84,7 +88,7 @@ function TicketDetailInner() {
     api.getTags().then(setAllTags).catch(() => {});
   }, [id]);
 
-    if (state.status === 'loading' || !minTimeDone)
+  if (state.status === 'loading' || !minTimeDone)
     return (
       <div className="flex min-h-[70vh] items-center justify-center px-4">
         <div className="relative flex w-full max-w-md flex-col items-center gap-4 overflow-hidden rounded-2xl border border-line bg-surface/95 px-8 py-12 text-center shadow-2xl shadow-navy/20 backdrop-blur-sm">
@@ -118,7 +122,7 @@ function TicketDetailInner() {
   const sla = slaInfo(dueAt, ticket.status);
   const role = user?.role;
 
-  // author id -> naam (sirf requester/assignee ke naam maloom hain)
+  // author id -> name (fallback for comments that carry no author_name)
   const people: Record<number, string> = {};
   if (ticket.requester) people[ticket.requester.id ?? ticket.requester_id] = ticket.requester.full_name;
   if (ticket.assignee) people[ticket.assignee.id ?? ticket.assignee_id] = ticket.assignee.full_name;
@@ -127,7 +131,7 @@ function TicketDetailInner() {
     setAssignError('');
     const parsed = Number(assigneeIdInput);
     if (!assigneeIdInput || Number.isNaN(parsed)) {
-      setAssignError('Enter a numeric user ID.');
+      setAssignError('Pick someone to assign this ticket to.');
       return;
     }
     try {
@@ -264,7 +268,7 @@ function TicketDetailInner() {
             {role && permissions.canEditTicket(role, ticket.requester_id === user?.id) && !editMode && (
               <button
                 onClick={startEdit}
-                className="text-brand-dark text-sm border border-brand-dark/ rounded-md px-3 py-1.5 hover:bg-brand/15 transition-colors"
+                className="text-brand-dark text-sm border border-brand-dark/30 rounded-md px-3 py-1.5 hover:bg-brand/15 transition-colors"
               >
                 Edit
               </button>
@@ -330,7 +334,7 @@ function TicketDetailInner() {
           {(ticket.ticketTags || []).map((tt: any) => (
             <span
               key={tt.tag.id}
-              className="border border-brand-dark/ bg-brand/15 text-brand-dark rounded-full px-3 py-1 text-xs flex items-center gap-1.5"
+              className="border border-brand-dark/30 bg-brand/15 text-brand-dark rounded-full px-3 py-1 text-xs flex items-center gap-1.5"
             >
               {tt.tag.name}
               {role && permissions.canManageTags(role) && (
@@ -393,7 +397,7 @@ function TicketDetailInner() {
         {role && permissions.canAssign(role) && (
           <div className="mt-4 border-t border-line pt-4">
             <div className="text-xs font-semibold tracking-wide text-muted mb-2">
-              Assign to (user ID)
+              Assign to
             </div>
             {assignError && (
               <p className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded-md py-1.5 px-3 mb-2">
@@ -401,11 +405,10 @@ function TicketDetailInner() {
               </p>
             )}
             <div className="flex gap-2">
-              <input
-                className={`${inputClass} w-24`}
-                placeholder="e.g. 3"
+              <StaffSelect
                 value={assigneeIdInput}
-                onChange={(e) => setAssigneeIdInput(e.target.value)}
+                onChange={setAssigneeIdInput}
+                className={`${inputClass} flex-1`}
               />
               <button
                 onClick={handleAssign}
@@ -429,6 +432,12 @@ function TicketDetailInner() {
         )}
       </div>
 
+      <RatingStars
+        ticketId={id}
+        status={ticket.status}
+        isRequester={ticket.requester_id === user?.id}
+      />
+
       <div className="rounded-xl border border-line bg-surface backdrop-blur p-6 mt-6">
         <h2 className="text-lg font-bold mb-3">Comments</h2>
         <ul className="flex flex-col gap-3">
@@ -443,9 +452,11 @@ function TicketDetailInner() {
             >
               <div className="flex items-center gap-2 text-xs text-muted">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/25 text-[10px] font-bold text-brand-dark">
-                  {initials(people[c.author_id])}
+                  {initials(c.author_name ?? people[c.author_id])}
                 </span>
-                <span className="text-navy">{people[c.author_id] ?? `User #${c.author_id}`}</span>
+                <span className="text-navy">
+                  {c.author_name ?? people[c.author_id] ?? `User #${c.author_id}`}
+                </span>
                 <span>·</span>
                 <span title={c.created_at}>{timeAgo(c.created_at)}</span>
                 {c.is_internal && (
@@ -472,6 +483,9 @@ function TicketDetailInner() {
             value={commentBody}
             onChange={(e) => setCommentBody(e.target.value)}
           />
+          {role && permissions.canWriteInternalComment(role) && (
+            <SuggestReply ticketId={id} onUse={setCommentBody} />
+          )}
           {role && permissions.canWriteInternalComment(role) && (
             <label className="flex items-center gap-2 text-sm text-navy">
               <input
@@ -500,7 +514,7 @@ function TicketDetailInner() {
               ? `Status changed from ${e.from_status} to ${e.to_status}${e.note ? ` — ${e.note}` : ''}`
               : e.note || 'Ticket updated';
             return (
-              <li key={e.id} className="text-sm text-muted border-l-2 border-brand-dark/ pl-3">
+              <li key={e.id} className="text-sm text-muted border-l-2 border-brand-dark/30 pl-3">
                 {sentence} <span className="text-muted">· {timeAgo(e.created_at)}</span>
               </li>
             );

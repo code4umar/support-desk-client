@@ -74,6 +74,19 @@ export const api = {
       true
     ),
   me: () => request<any>('/auth/me'),
+    getStaff: () => request<any[]>('/staff'),
+  getRating: (id: string) => request<any>(`/tickets/${id}/rating`),
+  rateTicket: (id: string, stars: number, comment?: string) =>
+    request<any>(`/tickets/${id}/rating`, {
+      method: 'POST',
+      body: JSON.stringify({ stars, comment }),
+    }),
+  getRatingSummary: () => request<{ average: number; count: number }>('/ratings/summary'),
+  suggestReply: (id: string) =>
+    request<{ draft: string }>(`/tickets/${id}/suggest-reply`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
     forgotPassword: (email: string) =>
     request<{ message: string }>(
       '/auth/forgot-password',
