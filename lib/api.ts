@@ -147,17 +147,20 @@ export const api = {
   removeTagFromTicket: (id: string, tagId: string) =>
     request<void>(`/tickets/${id}/tags/${tagId}`, { method: 'DELETE' }),
 
-  // Canned Replies endpoints added below
+  // Updated Canned Replies endpoints to handle component parameters correctly
   getCannedReplies: () => 
     request<any[]>('/canned-replies'),
     
-  createCannedReply: (data: any) =>
-    request<any>('/canned-replies', { 
+  createCannedReply: (...args: any[]) => {
+    // Packages multiple function arguments into a single request body structure
+    const body = args.length === 2 ? { title: args[0], content: args[1] } : args[0];
+    return request<any>('/canned-replies', { 
       method: 'POST', 
-      body: JSON.stringify(data) 
-    }),
+      body: JSON.stringify(body) 
+    });
+  },
     
-  deleteCannedReply: (id: string) =>
+  deleteCannedReply: (id: string | number) =>
     request<void>(`/canned-replies/${id}`, { 
       method: 'DELETE' 
     }),
