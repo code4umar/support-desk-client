@@ -13,6 +13,7 @@ import type { TicketStatus } from '@/lib/transitions';
 import RatingStars from '@/components/RatingStars';
 import StaffSelect from '@/components/StaffSelect';
 import SuggestReply from '@/components/SuggestReply';
+import CannedReplies from '@/components/CannedReplies';
 
 type State =
   | { status: 'loading' }
@@ -147,6 +148,18 @@ function TicketDetailInner() {
       } else {
         setAssignError('Could not assign ticket.');
       }
+    }
+  }
+
+  async function handleAssignToMe() {
+    if (!user) return;
+    setAssignError('');
+    try {
+      await api.assignTicket(id, Number(user.id));
+      show('Assigned to you');
+      loadAll();
+    } catch {
+      setAssignError('Could not assign ticket.');
     }
   }
 
@@ -416,6 +429,14 @@ function TicketDetailInner() {
               >
                 Assign
               </button>
+              {user && String(ticket.assignee_id ?? '') !== String(user.id) && (
+                <button
+                  onClick={handleAssignToMe}
+                  className="text-brand-dark text-sm border border-brand-dark/30 rounded-md px-3 py-2 hover:bg-brand/15 transition-colors whitespace-nowrap"
+                >
+                  Assign to me
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -483,6 +504,18 @@ function TicketDetailInner() {
             value={commentBody}
             onChange={(e) => setCommentBody(e.target.value)}
           />
+          {role && permissions.canWriteInternalComment(role) && (
+            <CannedReplies
+              currentText={commentBody}
+              onPick={(text) => setCommentBody((prev) => (prev.trim() ? `${prev}\n\n${text}` : text))}
+              vars={{
+                name: (ticket.requester?.full_name ?? 'there').split(' ')[0],
+                agent: user?.name ?? 'Support',
+              }}
+              meId={user?.id}
+              isAdmin={String(role) === 'admin'}
+            />
+          )}
           {role && permissions.canWriteInternalComment(role) && (
             <SuggestReply ticketId={id} onUse={setCommentBody} />
           )}
