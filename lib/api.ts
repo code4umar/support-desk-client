@@ -29,7 +29,7 @@ async function request<T>(
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
- const res = await fetch(`${BASE_URL}${path}`, { ...options, headers, cache: 'no-store' });
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers, cache: 'no-store' });
 
   if (res.status === 204) {
     return undefined as T;
@@ -74,7 +74,7 @@ export const api = {
       true
     ),
   me: () => request<any>('/auth/me'),
-    getStaff: () => request<any[]>('/staff'),
+  getStaff: () => request<any[]>('/staff'),
   getRating: (id: string) => request<any>(`/tickets/${id}/rating`),
   rateTicket: (id: string, stars: number, comment?: string) =>
     request<any>(`/tickets/${id}/rating`, {
@@ -87,7 +87,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({}),
     }),
-    forgotPassword: (email: string) =>
+  forgotPassword: (email: string) =>
     request<{ message: string }>(
       '/auth/forgot-password',
       { method: 'POST', body: JSON.stringify({ email }) },
@@ -146,6 +146,21 @@ export const api = {
     }),
   removeTagFromTicket: (id: string, tagId: string) =>
     request<void>(`/tickets/${id}/tags/${tagId}`, { method: 'DELETE' }),
+
+  // Canned Replies endpoints added below
+  getCannedReplies: () => 
+    request<any[]>('/canned-replies'),
+    
+  createCannedReply: (data: any) =>
+    request<any>('/canned-replies', { 
+      method: 'POST', 
+      body: JSON.stringify(data) 
+    }),
+    
+  deleteCannedReply: (id: string) =>
+    request<void>(`/canned-replies/${id}`, { 
+      method: 'DELETE' 
+    }),
 };
 
 export { ApiRequestError };
