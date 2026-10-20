@@ -74,6 +74,17 @@ export const api = {
       true
     ),
   me: () => request<any>('/auth/me'),
+  getUsers: () => request<any[]>('/users'),
+  setUserRole: (id: number, role: string) =>
+    request<any>(`/users/${id}/role`, { method: 'PATCH', body: JSON.stringify({ role }) }),
+  updateMe: (full_name: string) =>
+    request<any>('/users/me', { method: 'PATCH', body: JSON.stringify({ full_name }) }),
+  changePassword: (current_password: string, new_password: string) =>
+    request<{ message: string }>('/users/me/password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password, new_password }),
+    }),
+  getActivity: (limit = 50) => request<any[]>(`/activity?limit=${limit}`),
   getStaff: () => request<any[]>('/staff'),
   getRating: (id: string) => request<any>(`/tickets/${id}/rating`),
   rateTicket: (id: string, stars: number, comment?: string) =>

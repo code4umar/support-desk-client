@@ -16,7 +16,9 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserRaw] = useState<User | null>(null);
+  const setUser = (u: (User & { full_name?: string }) | null) =>
+    setUserRaw(u ? { ...u, name: u.name ?? u.full_name ?? '' } : null);
   const [token, setTokenState] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,6 +53,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user);
   }
 
+  async function refreshUser() {
+    try {
+      setUser(await api.me());
+    } catch {
+      /* keep the current user */
+    }
+  }
+
   function logout() {
     clearToken();
     setTokenState(null);
@@ -58,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

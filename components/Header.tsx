@@ -3,6 +3,8 @@ import { useAuth } from '@/lib/auth-context';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
 import NotificationBell from './NotificationBell';
+import Avatar from './Avatar';
+import MobileNav from './MobileNav';
 
 export default function Header() {
   const { user, loading, logout } = useAuth();
@@ -26,7 +28,7 @@ export default function Header() {
         {user ? (
           <div className="flex items-center gap-4">
             {/* NEW: nav links */}
-           <nav className="flex items-center gap-1">
+           <nav className="hidden items-center gap-1 sm:flex">
               <Link
                 href="/tickets"
                 className="text-sm font-medium text-muted hover:text-navy transition-colors px-3 py-1.5 rounded-md hover:bg-navy/5"
@@ -39,15 +41,23 @@ export default function Header() {
               >
                 Dashboard
               </Link>
+              <Link href="/settings" className="text-sm font-medium text-muted hover:text-navy transition-colors px-3 py-1.5 rounded-md hover:bg-navy/5">
+                Settings
+              </Link>
+              {user.role === 'admin' && (
+                <Link href="/admin" className="text-sm font-medium text-muted hover:text-navy transition-colors px-3 py-1.5 rounded-md hover:bg-navy/5">
+                  Admin
+                </Link>
+              )}
             </nav>
 
             <NotificationBell />
 
             <ThemeToggle />
-
+            <MobileNav name={user.name} role={user.role} onLogout={logout} />
 
             <div className="hidden sm:flex items-center gap-2 rounded-full border border-line bg-navy/5 px-3 py-1.5">
-              <span className="h-2 w-2 rounded-full bg-brand" />
+              <Avatar name={user.name} size={24} />
               <span className="text-sm font-medium text-navy">{user.name}</span>
               <span className="text-xs uppercase tracking-wide text-brand-dark font-semibold">
                 {user.role}
@@ -55,7 +65,7 @@ export default function Header() {
             </div>
             <button
               onClick={logout}
-              className="text-sm font-medium text-muted hover:text-navy transition-colors px-3 py-1.5 rounded-md hover:bg-navy/5"
+              className="hidden sm:block text-sm font-medium text-muted hover:text-navy transition-colors px-3 py-1.5 rounded-md hover:bg-navy/5"
             >
               Sign out
             </button>

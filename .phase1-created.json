@@ -1,0 +1,8 @@
+[
+  "components/Avatar.tsx",
+  "components/AnimatedNumber.tsx",
+  "components/DonutChart.tsx",
+  "components/MobileNav.tsx",
+  "app/icon.svg",
+  "app/opengraph-image.tsx"
+]

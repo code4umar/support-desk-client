@@ -6,6 +6,8 @@ import { slaInfo } from '@/lib/time';
 import RequireAuth from '@/components/RequireAuth';
 import TrendChart from '@/components/TrendChart';
 import RoleWelcome from '@/components/RoleWelcome';
+import AnimatedNumber from '@/components/AnimatedNumber';
+import DonutChart from '@/components/DonutChart';
 
 type Ticket = {
   id: number;
@@ -84,7 +86,7 @@ function Stat({
   const body = (
     <div className="rounded-xl border border-line bg-navy/[0.03] p-4 transition-colors hover:border-brand-dark/">
       <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
-      <div className={`mt-1 text-3xl font-bold ${tone ?? 'text-navy'}`}>{value}</div>
+      <div className={`mt-1 text-3xl font-bold ${tone ?? 'text-navy'}`}>{typeof value === 'number' ? <AnimatedNumber value={value} /> : value}</div>
     </div>
   );
   return href ? <Link href={href}>{body}</Link> : body;
@@ -265,6 +267,15 @@ function DashboardInner() {
         )}
       </div>
       <TrendChart tickets={tickets} />
+      <DonutChart
+        title="Status overview"
+        slices={[
+          { label: 'Open', value: stats.byStatus.open, color: '#2ee6d6' },
+          { label: 'In progress', value: stats.byStatus.in_progress, color: '#f59e0b' },
+          { label: 'Resolved', value: stats.byStatus.resolved, color: '#22c55e' },
+          { label: 'Closed', value: stats.byStatus.closed, color: '#94a3b8' },
+        ]}
+      />
       <div className="grid gap-4 md:grid-cols-2">
         <Bars title="Tickets by status" data={stats.byStatus} colors={statusColor} param="status" />
         <Bars title="Tickets by priority" data={stats.byPrio} colors={prioColor} param="priority" />
