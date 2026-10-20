@@ -11,6 +11,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>; // <--- Added missing property here
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
