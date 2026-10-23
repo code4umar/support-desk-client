@@ -1,0 +1,6 @@
+[
+  "components/Sidebar.tsx",
+  "components/TopBar.tsx",
+  "components/AppShell.tsx",
+  "components/dashboard/widgets.tsx"
+]

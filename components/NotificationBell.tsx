@@ -20,6 +20,8 @@ const POLL_MS = 20000;
 const TYPE_LABEL: Record<string, string> = {
   ticket_created: 'New ticket',
   user_login: 'Login',
+  user_registered: 'New account',
+  mention: 'Mention',
 };
 
 // Bell with an unread badge. Only admins receive notifications, so for every
@@ -29,7 +31,7 @@ export default function NotificationBell() {
   const { user } = useAuth();
   const router = useRouter();
   const { show } = useToast();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || user?.role === 'agent'; // agents get the mentions
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Notif[]>([]);

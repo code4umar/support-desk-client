@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { permissions } from '@/lib/permissions';
-import { timeAgo, slaInfo, initials } from '@/lib/time';
+import { timeAgo, initials } from '@/lib/time';
 import StatusControl from '@/components/StatusControl';
 import RequireAuth from '@/components/RequireAuth';
 import type { TicketStatus } from '@/lib/transitions';
@@ -14,6 +14,9 @@ import RatingStars from '@/components/RatingStars';
 import StaffSelect from '@/components/StaffSelect';
 import SuggestReply from '@/components/SuggestReply';
 import CannedReplies from '@/components/CannedReplies';
+import SlaCountdown from '@/components/SlaCountdown';
+import MentionText from '@/components/MentionText';
+import MentionPicker from '@/components/MentionPicker';
 
 type State =
   | { status: 'loading' }
@@ -120,7 +123,6 @@ function TicketDetailInner() {
 
   const { ticket } = state;
   const dueAt = ticket.due_at;
-  const sla = slaInfo(dueAt, ticket.status);
   const role = user?.role;
 
   // author id -> name (fallback for comments that carry no author_name)
@@ -270,11 +272,7 @@ function TicketDetailInner() {
               >
                 {ticket.priority}
               </span>
-              {sla && (
-                <span className={`text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border ${sla.cls}`}>
-                  {sla.label}
-                </span>
-              )}
+              <SlaCountdown dueAt={dueAt} status={ticket.status} />
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -486,7 +484,7 @@ function TicketDetailInner() {
                   </span>
                 )}
               </div>
-              <p className="text-sm text-navy mt-1">{c.body}</p>
+              <p className="text-sm text-navy mt-1"><MentionText body={c.body} /></p>
             </li>
           ))}
         </ul>
@@ -504,6 +502,12 @@ function TicketDetailInner() {
             value={commentBody}
             onChange={(e) => setCommentBody(e.target.value)}
           />
+          {role && permissions.canWriteInternalComment(role) && (
+            <MentionPicker
+              meId={user?.id}
+              onPick={(tag) => setCommentBody((prev) => (prev && !/\s$/.test(prev) ? `${prev} ${tag}` : prev + tag))}
+            />
+          )}
           {role && permissions.canWriteInternalComment(role) && (
             <CannedReplies
               currentText={commentBody}

@@ -27,7 +27,7 @@ export default function MobileNav({ name, role, onLogout }: { name: string; role
   const item = 'block rounded-lg px-3 py-2.5 text-sm font-medium text-navy hover:bg-navy/5';
 
   return (
-    <div ref={box} className="relative sm:hidden">
+    <div ref={box} className="relative md:hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

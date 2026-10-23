@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
 import { ToastProvider } from "@/components/Toast";
-import Header from "@/components/Header";
+import AppShell from "@/components/AppShell";
 import SplashScreen from "@/components/SplashScreen";
 import Shortcuts from "@/components/Shortcuts";
 import CommandPalette from "@/components/CommandPalette";
@@ -35,7 +35,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var t=localStorage.getItem('theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t}catch(e){}",
+              "try{var t=localStorage.getItem('theme');if(!t)t='dark';document.documentElement.dataset.theme=t}catch(e){}",
           }}
         />
       </head>
@@ -43,13 +43,12 @@ export default function RootLayout({
         <SplashScreen />
         <ToastProvider>
           <AuthProvider>
-            <Header />
             <Shortcuts />
             <CommandPalette />
             <ShortcutsHelp />
             <NewTicketsBanner />
             <TitleSync />
-            <main className="max-w-5xl mx-auto p-4">{children}</main>
+            <AppShell>{children}</AppShell>
           </AuthProvider>
         </ToastProvider>
         <Script src="/_vercel/insights/script.js" strategy="afterInteractive" />
