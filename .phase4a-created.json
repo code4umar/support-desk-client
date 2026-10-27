@@ -1,0 +1,5 @@
+[
+  "lib/attachments.ts",
+  "components/AttachmentsPanel.tsx",
+  "__tests__/attachments.test.tsx"
+]

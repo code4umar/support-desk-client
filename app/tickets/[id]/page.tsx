@@ -14,6 +14,7 @@ import RatingStars from '@/components/RatingStars';
 import StaffSelect from '@/components/StaffSelect';
 import SuggestReply from '@/components/SuggestReply';
 import CannedReplies from '@/components/CannedReplies';
+import AttachmentsPanel from '@/components/AttachmentsPanel';
 import SlaCountdown from '@/components/SlaCountdown';
 import MentionText from '@/components/MentionText';
 import MentionPicker from '@/components/MentionPicker';
@@ -457,6 +458,7 @@ function TicketDetailInner() {
         isRequester={ticket.requester_id === user?.id}
       />
 
+      <AttachmentsPanel ticketId={ticket.id} meId={user?.id} isStaff={!!role && permissions.canWriteInternalComment(role)} />
       <div className="rounded-xl border border-line bg-surface backdrop-blur p-6 mt-6">
         <h2 className="text-lg font-bold mb-3">Comments</h2>
         <ul className="flex flex-col gap-3">
