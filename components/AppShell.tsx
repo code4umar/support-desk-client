@@ -23,12 +23,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="app-outer min-h-screen md:p-5 lg:p-7">
-      <div className="app-window mx-auto flex min-h-screen max-w-[1480px] overflow-clip md:min-h-[calc(100vh-2.5rem)] md:rounded-[28px] lg:min-h-[calc(100vh-3.5rem)]">
+    // From md up the app is exactly one screen tall and the page never scrolls:
+    // each page lays itself out inside <main>. (main keeps a scroll fallback
+    // only for very short windows.) Phones scroll normally.
+    <div className="app-outer min-h-screen md:h-dvh md:overflow-hidden md:p-3 lg:p-4">
+      <div className="app-window mx-auto flex min-h-screen max-w-[1480px] overflow-clip md:h-full md:min-h-0 md:rounded-[28px]">
         <Sidebar />
-        <div className="relative z-10 flex min-w-0 flex-1 flex-col">
+        <div className="relative z-10 flex min-w-0 flex-1 flex-col md:min-h-0">
           <TopBar />
-          <main className="flex-1 px-4 pb-10 pt-2 md:px-8">{children}</main>
+          <main className="flex-1 px-4 pb-8 pt-2 md:min-h-0 md:overflow-y-auto md:px-7 md:pb-5">{children}</main>
         </div>
       </div>
     </div>

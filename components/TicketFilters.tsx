@@ -3,11 +3,15 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import type { Category } from '@/types';
 
 const inputClass =
   'border border-line bg-surface rounded-md px-3 py-2 text-sm outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand/50 transition-colors [color-scheme:light]';
 
-const FILTER_KEYS = ['q', 'status', 'priority', 'tag', 'assigneeId', 'overdue'];
+const sortClass =
+  'border border-line bg-surface rounded-md px-2 py-1 text-xs outline-none focus:border-brand-dark [color-scheme:light]';
+
+const FILTER_KEYS = ['q', 'status', 'priority', 'categoryId', 'tag', 'assigneeId', 'overdue'];
 
 type Preset = {
   label: string;
@@ -28,9 +32,11 @@ export default function TicketFilters({
   const urlQ = searchParams.get('q') ?? '';
   const [search, setSearch] = useState(urlQ);
   const [tags, setTags] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     api.getTags().then(setTags).catch(() => {});
+    api.getCategories().then(setCategories).catch(() => {});
   }, []);
 
   // URL badle (preset / clear) to search box bhi badle
@@ -84,7 +90,7 @@ export default function TicketFilters({
   }
 
   return (
-    <div className="rounded-xl border border-line bg-surface backdrop-blur p-4 mb-6">
+    <div className="rounded-xl border border-line bg-surface backdrop-blur p-4 mb-4">
       {/* Saved views */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         {presets.map((p) => {
@@ -108,11 +114,34 @@ export default function TicketFilters({
           <button
             type="button"
             onClick={clearAll}
-            className="ml-auto text-xs text-muted hover:text-red-600 transition-colors"
+            className="text-xs text-muted hover:text-red-600 transition-colors"
           >
             Clear filters
           </button>
         )}
+
+        {/* sorting sits up here so the filter panel stays one row tall */}
+        <div className="ml-auto flex items-center gap-2">
+          <select
+            aria-label="sort by"
+            className={`${sortClass}`}
+            value={searchParams.get('sortBy') ?? 'createdAt'}
+            onChange={(e) => onChange('sortBy', e.target.value)}
+          >
+            <option value="createdAt">Sort: Created</option>
+            <option value="dueAt">Sort: Due date</option>
+            <option value="priority">Sort: Priority</option>
+          </select>
+          <select
+            aria-label="sort order"
+            className={sortClass}
+            value={searchParams.get('order') ?? 'desc'}
+            onChange={(e) => onChange('order', e.target.value)}
+          >
+            <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex gap-3 flex-wrap items-center">
@@ -148,6 +177,19 @@ export default function TicketFilters({
           <option value="urgent">Urgent</option>
         </select>
         <select
+          aria-label="category filter"
+          className={inputClass}
+          value={searchParams.get('categoryId') ?? ''}
+          onChange={(e) => onChange('categoryId', e.target.value || null)}
+        >
+          <option value="">All categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <select
           aria-label="tag filter"
           className={inputClass}
           value={searchParams.get('tag') ?? ''}
@@ -176,26 +218,6 @@ export default function TicketFilters({
           />
           Overdue
         </label>
-
-        <select
-          aria-label="sort by"
-          className={inputClass}
-          value={searchParams.get('sortBy') ?? 'createdAt'}
-          onChange={(e) => onChange('sortBy', e.target.value)}
-        >
-          <option value="createdAt">Sort: Created</option>
-          <option value="dueAt">Sort: Due date</option>
-          <option value="priority">Sort: Priority</option>
-        </select>
-        <select
-          aria-label="sort order"
-          className={inputClass}
-          value={searchParams.get('order') ?? 'desc'}
-          onChange={(e) => onChange('order', e.target.value)}
-        >
-          <option value="desc">Descending</option>
-          <option value="asc">Ascending</option>
-        </select>
       </div>
     </div>
   );

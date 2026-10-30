@@ -65,13 +65,14 @@ function SettingsInner() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
+    // profile and password sit side by side so the page fits one screen
+    <div className="mx-auto grid max-w-5xl content-start gap-5 lg:grid-cols-2">
+      <div className="lg:col-span-2">
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-sm text-muted">Manage your profile and password</p>
       </div>
 
-      <div className="flex items-center gap-4 rounded-xl border border-line bg-surface p-6">
+      <div className="flex items-center gap-4 rounded-xl border border-line bg-surface p-6 lg:col-span-2">
         <Avatar name={user.name} size={64} />
         <div className="min-w-0">
           <p className="truncate text-lg font-semibold text-navy">{user.name}</p>
