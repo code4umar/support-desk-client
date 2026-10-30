@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 
 export type Ticket = {
@@ -9,10 +9,16 @@ export type Ticket = {
   priority: string;
   due_at?: string | null;
   created_at?: string;
+  known_issue_id?: number | null;
 };
 
 export const PRIO_COLOR: Record<string, string> = { low: '#38bdf8', normal: '#4f7cff', high: '#ff9f1c', urgent: '#ef4565' };
-const STATUS_PERCENT: Record<string, number> = { open: 25, in_progress: 60, resolved: 100, closed: 100 };
+const STATUS_PILL: Record<string, { label: string; color: string }> = {
+  open: { label: 'Open', color: '#ff9f1c' },
+  in_progress: { label: 'In progress', color: '#4f7cff' },
+  resolved: { label: 'Resolved', color: '#1fb8ad' },
+  closed: { label: 'Closed', color: '#8a94a6' },
+};
 
 /* ---------- small shared pieces ---------- */
 export function LogoMark({ className = '', light = false }: { className?: string; light?: boolean }) {
@@ -43,17 +49,14 @@ export function SearchButton({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function ProgressRing({ percent, color, size = 46 }: { percent: number; color: string; size?: number }) {
-  const r = (size - 6) / 2;
-  const c = 2 * Math.PI * r;
+// status in words, with a dot in the priority colour (replaces an unlabelled % ring)
+function StatusPill({ status, priority }: { status: string; priority: string }) {
+  const s = STATUS_PILL[status] ?? { label: status, color: '#8a94a6' };
   return (
-    <span className="relative inline-flex shrink-0 items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeOpacity={0.22} strokeWidth={3} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" strokeDasharray={`${(percent / 100) * c} ${c}`} />
-      </svg>
-      <span className="absolute inset-[5px] flex items-center justify-center rounded-full text-[11px] font-bold text-white" style={{ background: color }}>
-        {percent}%
+    <span className="flex shrink-0 items-center gap-2" title={`${s.label} · ${priority} priority`}>
+      <span className="h-2 w-2 rounded-full" style={{ background: PRIO_COLOR[priority] ?? '#8a94a6' }} aria-hidden="true" />
+      <span className="rounded-full border px-2.5 py-0.5 text-[11px] font-semibold" style={{ color: s.color, borderColor: `${s.color}55`, background: `${s.color}1a` }}>
+        {s.label}
       </span>
     </span>
   );
@@ -62,10 +65,28 @@ function ProgressRing({ percent, color, size = 46 }: { percent: number; color: s
 const fmtDate = (iso?: string) =>
   iso ? new Date(iso).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }) : '';
 
+// How many fixed-height rows fit in an element whose height comes from the
+// page layout (dashboard cards stretch to the bottom of the screen). Where the
+// height follows the content instead (phones), it simply stays at `min`.
+export function useFitCount<T extends HTMLElement>(rowPx: number, gapPx: number, min = 3) {
+  const ref = useRef<T>(null);
+  const [count, setCount] = useState(min);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      setCount(Math.max(min, Math.floor((entry.contentRect.height + gapPx) / (rowPx + gapPx))));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [rowPx, gapPx, min]);
+  return [ref, count] as const;
+}
+
 /* ---------- hero banner ---------- */
-export function HeroBanner() {
+export function HeroBanner({ className = '' }: { className?: string }) {
   return (
-    <div className="glass-card relative overflow-hidden px-7 py-7">
+    <div className={`glass-card relative flex flex-col justify-center overflow-hidden px-7 py-7 ${className}`}>
       <div className="relative z-10 max-w-[60%]">
         <h2 className="text-2xl font-semibold leading-snug text-navy">
           Something needs fixing?
@@ -102,24 +123,29 @@ export function HeroBanner() {
 }
 
 /* ---------- recent tickets ("top activities") ---------- */
+// Shows as many of `tickets` as fit in the card's height.
 export function ActivityList({ tickets }: { tickets: Ticket[] }) {
+  const [listRef, fit] = useFitCount<HTMLUListElement>(40, 16, 4);
   return (
-    <div className="glass-card p-6">
-      <h3 className="mb-4 text-lg font-semibold text-navy">Recent tickets</h3>
+    <div className="glass-card flex flex-col p-6 md:h-full md:min-h-0">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h3 className="text-lg font-semibold text-navy">Recent tickets</h3>
+        <Link href="/tickets" className="text-xs text-brand-dark hover:underline">View all →</Link>
+      </div>
       {tickets.length === 0 ? (
         <p className="py-6 text-sm text-muted">No tickets yet.</p>
       ) : (
-        <ul className="space-y-4">
-          {tickets.map((t) => (
+        <ul ref={listRef} className="flex flex-col gap-4 overflow-hidden md:min-h-0 md:flex-1">
+          {tickets.slice(0, fit).map((t) => (
             <li key={t.id}>
-              <Link href={`/tickets/${t.id}`} className="flex items-center justify-between gap-3 rounded-lg transition-opacity hover:opacity-80">
+              <Link href={`/tickets/${t.id}`} className="flex h-10 items-center justify-between gap-3 rounded-lg transition-opacity hover:opacity-80">
                 <span className="min-w-0">
                   <span className="block truncate text-[15px] font-medium text-navy">{t.subject}</span>
                   <span className="block text-xs text-muted">
                     #{t.id} · {fmtDate(t.created_at)}
                   </span>
                 </span>
-                <ProgressRing percent={STATUS_PERCENT[t.status] ?? 25} color={PRIO_COLOR[t.priority] ?? '#38a9e8'} />
+                <StatusPill status={t.status} priority={t.priority} />
               </Link>
             </li>
           ))}
@@ -130,9 +156,9 @@ export function ActivityList({ tickets }: { tickets: Ticket[] }) {
 }
 
 /* ---------- gradient number cards (like the pink / blue cards) ---------- */
-export function GradientCard({ title, value, footLabel, footValue, from, to, href, tone = 'dark' }: { title: string; value: number; footLabel: string; footValue: number; from: string; to: string; href: string; tone?: 'light' | 'dark' }) {
+export function GradientCard({ title, value, footLabel, footValue, from, to, href, tone = 'dark', compact = false }: { title: string; value: number; footLabel: string; footValue: number; from: string; to: string; href: string; tone?: 'light' | 'dark'; compact?: boolean }) {
   return (
-    <Link href={href} className={`relative block h-[150px] overflow-hidden rounded-2xl p-5 shadow-lg ring-1 ring-white/10 transition-transform hover:-translate-y-0.5 ${tone === 'light' ? 'text-[#213558]' : 'text-white'}`} style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}>
+    <Link href={href} className={`relative block overflow-hidden rounded-2xl shadow-lg ring-1 ring-white/10 transition-transform hover:-translate-y-0.5 ${compact ? 'h-[116px] p-4' : 'h-[150px] p-5'} ${tone === 'light' ? 'text-[#213558]' : 'text-white'}`} style={{ background: `linear-gradient(135deg, ${from}, ${to})` }}>
       <svg className="pointer-events-none absolute right-0 top-0 h-full w-[48%]" viewBox="0 0 140 150" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
         <path d="M140 0H70a70 70 0 0 1 70 70z" fill="#fff" opacity=".92" />
         <path d="M140 70a70 70 0 0 1-70 70h70z" fill="#fff" opacity=".55" />
@@ -144,29 +170,29 @@ export function GradientCard({ title, value, footLabel, footValue, from, to, hre
           <LogoMark className="h-3.5 w-5" light={tone === 'dark'} />
           {title}
         </p>
-        <p className="mt-4 text-4xl font-bold tracking-[0.12em]">{value}</p>
-        <p className="mt-3 text-xs font-medium uppercase tracking-wider opacity-90">
+        <p className={`${compact ? 'mt-1.5 text-3xl' : 'mt-4 text-4xl'} font-bold tracking-[0.12em]`}>{value}</p>
+        <p className={`${compact ? 'mt-1.5' : 'mt-3'} text-xs font-medium uppercase tracking-wider opacity-90`}>
           {footLabel} <span className="ml-1 text-sm font-bold tracking-normal">{footValue}</span>
         </p>
       </div>
-      <span className="absolute bottom-4 right-5 flex">
-        <span className={`h-7 w-7 rounded-full ${tone === 'light' ? 'bg-[#213558]/60' : 'bg-black/45'}`} />
-        <span className="-ml-3 h-7 w-7 rounded-full bg-white/60" />
-      </span>
     </Link>
   );
 }
 
 /* ---------- reports line chart ---------- */
 const RANGES = [{ label: '7 days', days: 7 }, { label: '14 days', days: 14 }, { label: '30 days', days: 30 }];
-const W = 300, H = 190, PL = 34, PR = 12, PT = 20, PB = 28;
+// plot padding in px; the plot itself takes whatever size its card gives it
+const PL = 34, PR = 14, PT = 22, PB = 30;
 
+// Smooth curve through the points. Control points stay between each pair's
+// own y values, so the line never overshoots above a peak or below zero.
 function smoothPath(pts: { x: number; y: number }[]) {
   if (pts.length < 2) return '';
-  const clampY = (y: number) => Math.min(H - PB, Math.max(PT, y));
   let d = `M${pts[0].x},${pts[0].y}`;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[i - 1] ?? pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] ?? p2;
+    const lo = Math.min(p1.y, p2.y), hi = Math.max(p1.y, p2.y);
+    const clampY = (y: number) => Math.min(hi, Math.max(lo, y));
     d += ` C${p1.x + (p2.x - p0.x) / 6},${clampY(p1.y + (p2.y - p0.y) / 6)} ${p2.x - (p3.x - p1.x) / 6},${clampY(p2.y - (p3.y - p1.y) / 6)} ${p2.x},${p2.y}`;
   }
   return d;
@@ -175,7 +201,20 @@ function smoothPath(pts: { x: number; y: number }[]) {
 export function ReportsChart({ tickets }: { tickets: Ticket[] }) {
   const [days, setDays] = useState(14);
   const [hover, setHover] = useState<number | null>(null);
+  const [size, setSize] = useState({ w: 300, h: 190 });
   const box = useRef<HTMLDivElement>(null);
+
+  // draw at the box's real pixel size, so the chart fills its card without stretched text
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0) setSize({ w: Math.round(width), h: Math.max(160, Math.round(height)) });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const series = useMemo(() => {
     const end = new Date();
@@ -195,11 +234,12 @@ export function ReportsChart({ tickets }: { tickets: Ticket[] }) {
     return out;
   }, [tickets, days]);
 
+  const { w: W, h: H } = size;
   const max = Math.max(1, ...series.map((s) => s.count));
   const yMax = Math.max(4, Math.ceil(max / 4) * 4);
   const pts = series.map((s, i) => ({ x: PL + (i * (W - PL - PR)) / (series.length - 1), y: PT + (1 - s.count / yMax) * (H - PT - PB) }));
   const active = hover ?? series.length - 1;
-  const step = Math.ceil(series.length / 6);
+  const step = Math.ceil(series.length / Math.max(3, Math.floor(W / 70)));
   const total = series.reduce((a, s) => a + s.count, 0);
 
   function onMove(e: React.PointerEvent) {
@@ -212,9 +252,12 @@ export function ReportsChart({ tickets }: { tickets: Ticket[] }) {
   }
 
   return (
-    <div className="glass-card p-5">
+    <div className="glass-card flex flex-col p-5 md:h-full md:min-h-0">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-navy">Reports</h3>
+        <div>
+          <h3 className="text-lg font-semibold text-navy">Tickets created</h3>
+          <p className="text-xs text-muted">{total} in the last {days} days</p>
+        </div>
         <select
           aria-label="Report range"
           value={days}
@@ -224,30 +267,35 @@ export function ReportsChart({ tickets }: { tickets: Ticket[] }) {
           {RANGES.map((r) => <option key={r.days} value={r.days}>{r.label}</option>)}
         </select>
       </div>
-      <div ref={box} className="relative" onPointerMove={onMove} onPointerLeave={() => setHover(null)}>
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={`Tickets created in the last ${days} days: ${total}`}>
+      <div ref={box} className="relative min-h-[160px] md:min-h-0 md:flex-1" onPointerMove={onMove} onPointerLeave={() => setHover(null)}>
+        <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="absolute inset-0 h-full w-full" role="img" aria-label={`Tickets created in the last ${days} days: ${total}`}>
           {[0, 1, 2, 3, 4].map((i) => {
             const y = PT + (i * (H - PT - PB)) / 4;
             return (
               <g key={i}>
                 <line x1={PL} x2={W - PR} y1={y} y2={y} stroke="currentColor" className="text-navy/10" strokeDasharray="2 5" />
-                <text x={PL - 8} y={y + 3} textAnchor="end" fontSize="9" fill="currentColor" className="text-muted">{Math.round(yMax - (i * yMax) / 4)}</text>
+                <text x={PL - 8} y={y + 4} textAnchor="end" fontSize="11" fill="currentColor" className="text-muted">{Math.round(yMax - (i * yMax) / 4)}</text>
               </g>
             );
           })}
-          <path d={smoothPath(pts)} fill="none" stroke="var(--text)" strokeWidth="2.6" strokeLinecap="round" />
+          <path d={smoothPath(pts)} fill="none" stroke="var(--text)" strokeWidth="2.4" strokeLinecap="round" />
           <circle cx={pts[active].x} cy={pts[active].y} r="5.5" fill="#ff9f1c" stroke="var(--text)" strokeWidth="1.5" />
-          {series.map((s, i) => (i === active || (i % step === 0 && Math.abs(i - active) >= Math.max(2, Math.ceil(step * 0.7)))) ? (
-            <g key={i}>
-              {i === active && <rect x={pts[i].x - 20} y={H - 20} width="40" height="16" rx="8" fill="currentColor" className="text-navy/10" />}
-              <text x={pts[i].x} y={H - 8} textAnchor="middle" fontSize="8.5" fill="currentColor" className={i === active ? 'text-navy' : 'text-muted'}>
-                {s.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-              </text>
-            </g>
-          ) : null)}
+          {series.map((s, i) => {
+            if (!(i === active || (i % step === 0 && Math.abs(i - active) >= Math.max(2, Math.ceil(step * 0.7))))) return null;
+            // keep the date label (and its pill) inside the plot's edges
+            const lx = Math.min(W - 26, Math.max(PL, pts[i].x));
+            return (
+              <g key={i}>
+                {i === active && <rect x={lx - 24} y={H - 22} width="48" height="18" rx="9" fill="currentColor" className="text-navy/10" />}
+                <text x={lx} y={H - 9} textAnchor="middle" fontSize="11" fill="currentColor" className={i === active ? 'text-navy' : 'text-muted'}>
+                  {s.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                </text>
+              </g>
+            );
+          })}
         </svg>
-        <div className="glass-card pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded-xl px-3 py-1.5 text-center" style={{ left: `clamp(16%, ${(pts[active].x / W) * 100}%, 84%)`, top: `${(pts[active].y / H) * 100}%`, background: 'var(--card)' }}>
-          <span className="block text-[10px] text-muted">Created</span>
+        <div className="glass-card pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-[135%] whitespace-nowrap rounded-xl px-3 py-1.5 text-center" style={{ left: `clamp(12%, ${(pts[active].x / W) * 100}%, 88%)`, top: `${Math.max(28, (pts[active].y / H) * 100)}%`, background: 'var(--card)' }}>
+          <span className="block text-[10px] text-muted">{series[active].date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
           <span className="block text-sm font-semibold text-navy">{series[active].count} {series[active].count === 1 ? 'ticket' : 'tickets'}</span>
         </div>
       </div>
@@ -255,60 +303,12 @@ export function ReportsChart({ tickets }: { tickets: Ticket[] }) {
   );
 }
 
-/* ---------- status ring ---------- */
-export function StatusRing({ open, inProgress, done }: { open: number; inProgress: number; done: number }) {
-  const total = open + inProgress + done;
-  const R = 62, C = 2 * Math.PI * R, GAP = total > 0 && [open, inProgress, done].filter(Boolean).length > 1 ? 9 : 0;
-  const parts = [
-    { label: 'Resolved', value: done, color: '#1fe5d8' },
-    { label: 'In progress', value: inProgress, color: '#4f7cff' },
-    { label: 'Open', value: open, color: '#ff9f1c' },
-  ];
-  let acc = 0;
-  const arcs = parts.map((p) => {
-    const len = total ? (p.value / total) * C : 0;
-    const a = { ...p, len, start: acc };
-    acc += len;
-    return a;
-  });
-  const pct = total ? Math.round((done / total) * 100) : 0;
-
-  return (
-    <div className="glass-card p-5">
-      <div className="relative mx-auto h-[180px] w-[180px]">
-        <svg viewBox="0 0 160 160" className="h-full w-full -rotate-90" role="img" aria-label={`${pct}% of tickets resolved`}>
-          <circle cx="80" cy="80" r={R} fill="none" stroke="currentColor" strokeWidth="13" className="text-navy/10" />
-          {arcs.filter((a) => a.len > 0).map((a) => (
-            <g key={a.label}>
-              <circle cx="80" cy="80" r={R} fill="none" stroke={a.color} strokeWidth="13" strokeLinecap="round" strokeDasharray={`${Math.max(a.len - GAP, 0.5)} ${C}`} strokeDashoffset={-(a.start + GAP / 2)} />
-              <circle cx={80 + R * Math.cos((a.start / C) * 2 * Math.PI)} cy={80 + R * Math.sin((a.start / C) * 2 * Math.PI)} r="3.2" fill="#fff" opacity=".9" />
-            </g>
-          ))}
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-light text-navy">{pct}<span className="text-lg">%</span></span>
-          <span className="text-xs text-muted">resolved</span>
-        </div>
-      </div>
-      <ul className="mt-5 space-y-3 px-1">
-        {[...parts].reverse().map((p) => (
-          <li key={p.label} className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2.5 text-navy">
-              <span className="h-2 w-2 rounded-full" style={{ background: p.color }} />
-              {p.label}
-            </span>
-            <span className="font-medium text-navy">{p.value}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 /* ---------- needs attention ---------- */
+// Shows as many of `items` as fit in the card's height.
 export function AttentionList({ items, total }: { items: (Ticket & { _overdue: boolean })[]; total: number }) {
+  const [listRef, fit] = useFitCount<HTMLUListElement>(43, 0, 4); // 42px row + 1px divider
   return (
-    <div className="glass-card p-6">
+    <div className="glass-card flex flex-col p-6 md:h-full md:min-h-0">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-navy">
           Needs attention {total > 0 && <span className="ml-1.5 rounded-full bg-red-500/15 px-2 py-0.5 text-xs text-red-600 dark:text-red-400">{total}</span>}
@@ -318,10 +318,10 @@ export function AttentionList({ items, total }: { items: (Ticket & { _overdue: b
       {items.length === 0 ? (
         <p className="py-4 text-sm text-muted">Nothing urgent right now. Nice work.</p>
       ) : (
-        <ul className="divide-y divide-line">
-          {items.map((t) => (
+        <ul ref={listRef} className="divide-y divide-line overflow-hidden md:min-h-0 md:flex-1">
+          {items.slice(0, fit).map((t) => (
             <li key={t.id}>
-              <Link href={`/tickets/${t.id}`} className="flex items-center justify-between gap-3 py-2.5 text-sm hover:opacity-80">
+              <Link href={`/tickets/${t.id}`} className="flex h-[42px] items-center justify-between gap-3 text-sm hover:opacity-80">
                 <span className="min-w-0 truncate text-navy">{t.subject} <span className="text-muted">#{t.id}</span></span>
                 <span className="flex shrink-0 gap-2">
                   {t._overdue && <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[11px] text-red-600 dark:text-red-400">Overdue</span>}

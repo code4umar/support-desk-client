@@ -5,6 +5,7 @@ import ThemeToggle from './ThemeToggle';
 import NotificationBell from './NotificationBell';
 import Avatar from './Avatar';
 import MobileNav from './MobileNav';
+import BrandMark from './BrandMark';
 
 export default function Header() {
   const { user, loading, logout } = useAuth();
@@ -15,11 +16,9 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-brand-dark/20 bg-surface/85 backdrop-blur-md shadow-lg shadow-navy/10">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/dashboard" className="flex items-center gap-2 group">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-brand-dark shadow-md shadow-brand-dark/30 transition-transform group-hover:scale-105">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-on-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
+          <span className="transition-transform group-hover:scale-105">
+            <BrandMark size={34} />
+          </span>
           <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-navy to-muted bg-clip-text text-transparent">
             Deskly
           </span>

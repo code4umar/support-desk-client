@@ -1,5 +1,5 @@
 import { getToken, clearToken } from './session';
-import type { ApiError } from '@/types';
+import type { ApiError, Article, ArticleInput, ArticleSummary, Category, KbInsights, SimilarTickets, TicketStatus } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -146,6 +146,47 @@ export const api = {
     request<any>(`/notifications/${id}/read`, { method: 'PATCH' }),
   markAllNotificationsRead: () =>
     request<{ updated: number }>('/notifications/read-all', { method: 'PATCH' }),
+
+  getCategories: () => request<Category[]>('/categories'),
+  createCategory: (name: string) =>
+    request<Category>('/categories', { method: 'POST', body: JSON.stringify({ name }) }),
+  deleteCategory: (id: number) =>
+    request<void>(`/categories/${id}`, { method: 'DELETE' }),
+
+  // query: q, tag, categoryId, limit — built by the caller as a query string
+  searchArticles: (query: string) => request<ArticleSummary[]>(`/kb/articles?${query}`),
+  getArticle: (id: string) => request<Article>(`/kb/articles/${id}`),
+  getArticleTags: () => request<{ tag: string; count: number }[]>('/kb/tags'),
+  createArticle: (data: ArticleInput) =>
+    request<Article>('/kb/articles', { method: 'POST', body: JSON.stringify(data) }),
+  updateArticle: (id: string, data: Partial<ArticleInput>) =>
+    request<Article>(`/kb/articles/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteArticle: (id: string) =>
+    request<void>(`/kb/articles/${id}`, { method: 'DELETE' }),
+  // source 'ticket_form' = clicked on a suggestion while filing a ticket
+  articleFeedback: (id: number | string, helpful: boolean, source: 'article' | 'ticket_form' = 'article') =>
+    request<{ helpful: boolean }>(`/kb/articles/${id}/feedback`, {
+      method: 'POST',
+      body: JSON.stringify({ helpful, source }),
+    }),
+  getKbInsights: () => request<KbInsights>('/kb/insights'),
+  draftArticleFromTicket: (id: string) =>
+    request<{ title: string; body: string; tags: string[] }>(`/tickets/${id}/draft-article`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+
+  similarTickets: (q: string) =>
+    request<SimilarTickets>(`/tickets/similar?${new URLSearchParams({ q })}`),
+  linkTicket: (id: string, knownIssueId: number) =>
+    request<{ id: number; known_issue_id: number | null }>(`/tickets/${id}/link`, {
+      method: 'POST',
+      body: JSON.stringify({ knownIssueId }),
+    }),
+  unlinkTicket: (id: string) =>
+    request<{ id: number; known_issue_id: number | null }>(`/tickets/${id}/link`, { method: 'DELETE' }),
+  getLinkedTickets: (id: string) =>
+    request<{ id: number; subject: string; status: TicketStatus }[]>(`/tickets/${id}/linked`),
 
   getTags: () => request<any[]>('/tags'),
   createTag: (name: string) =>

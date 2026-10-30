@@ -1,5 +1,5 @@
 'use client';
-import { Suspense, useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { api, ApiRequestError } from '@/lib/api';
@@ -31,6 +31,13 @@ const statusStyles: Record<string, string> = {
   resolved: 'text-green-700 dark:text-green-400',
   closed: 'text-muted',
 };
+
+// one-line ticket row + gap, and the space kept free under/above the list (px):
+// the pager plus the window's bottom padding, and the "select all" bar
+const ROW_GAP = 8;
+const ROW_SPACE = 52 + ROW_GAP;
+const PAGER_SPACE = 100;
+const BULK_BAR_SPACE = 46;
 
 function csvCell(v: unknown): string {
   const s = v == null ? '' : String(v);
@@ -75,12 +82,35 @@ function TicketsPageInner() {
 
   const queryString = searchParams.toString();
 
+  // How many rows fit between the filters and the pager, so the page never
+  // scrolls: paging replaces scrolling. Re-measured when the window resizes.
+  const listRef = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState<number | null>(null);
   useEffect(() => {
+    const ro = new ResizeObserver(() => {
+      const el = listRef.current;
+      if (!el || window.innerWidth < 768) return setFit(10);
+      const reserved = PAGER_SPACE + (bulkEnabled ? BULK_BAR_SPACE : 0);
+      const available = window.innerHeight - el.getBoundingClientRect().top - reserved;
+      setFit(Math.max(3, Math.floor((available + ROW_GAP) / ROW_SPACE)));
+    });
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [bulkEnabled]);
+
+  // an explicit ?pageSize= in the URL wins over the fitted size
+  const fetchQuery =
+    fit === null || searchParams.has('pageSize')
+      ? queryString
+      : [queryString, `pageSize=${fit}`].filter(Boolean).join('&');
+
+  useEffect(() => {
+    if (fit === null) return;
     let cancelled = false;
     setState({ status: 'loading' });
     setSelected(new Set());
     api
-      .getTickets(queryString)
+      .getTickets(fetchQuery)
       .then((data: Envelope<Ticket>) => {
         if (!cancelled) setState({ status: 'ready', data });
       })
@@ -93,7 +123,7 @@ function TicketsPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [queryString, reloadKey]);
+  }, [fetchQuery, reloadKey, fit]);
 
   const updateParam = useCallback(
     (key: string, value: string | null) => {
@@ -245,21 +275,16 @@ function TicketsPageInner() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-            <div
-        className="relative rounded-xl border border-brand-dark/30 p-5 mb-6 overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(135deg, var(--card) 0%, var(--card) 55%, color-mix(in srgb, var(--accent) 28%, var(--card)) 100%)',
-        }}
-      >
-        <div className="pointer-events-none absolute -top-10 -right-10 h-48 w-48 rounded-full bg-brand/40 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-indigo-500/15 blur-3xl" />
-        <div className="relative flex items-center justify-between gap-3">
-          <div className="rounded-lg border border-line bg-navy/5 px-4 py-2">
-            <h1 className="text-2xl font-bold">Tickets</h1>
-            <p className="text-muted text-sm mt-1">Track and manage support requests</p>
-          </div>
+    <div className="mx-auto flex w-full max-w-5xl flex-col md:h-full md:min-h-0">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Tickets</h1>
+          <p className="text-sm text-muted">
+            Track and manage support requests
+            {state.status === 'ready' && ` · ${state.data.total} total`}
+          </p>
+        </div>
+        <div className="flex items-center justify-between gap-3">
           <div className="flex shrink-0 items-center gap-2">
             {state.status === 'ready' && rows.length > 0 && (
               <button
@@ -282,6 +307,7 @@ function TicketsPageInner() {
 
       <TicketFilters onChange={updateParam} />
 
+      <div ref={listRef} className="flex flex-col md:min-h-0 md:flex-1">
       {state.status === 'loading' && <ListSkeleton />}
       {state.status === 'error' && (
         <p className="text-red-500 text-center py-8">{state.message}</p>
@@ -319,7 +345,7 @@ function TicketsPageInner() {
       {state.status === 'ready' && rows.length > 0 && (
         <>
           {bulkEnabled && (
-            <div className="sticky top-[72px] z-30 mb-3 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface/90 px-4 py-2.5 backdrop-blur">
+            <div className="mb-2 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface/90 px-4 py-2 backdrop-blur">
               <label className="flex items-center gap-2 text-sm text-navy">
                 <input
                   type="checkbox"
@@ -356,7 +382,7 @@ function TicketsPageInner() {
                       <button
                         onClick={bulkChangeStatus}
                         disabled={busy || !bulkTarget}
-                        className="rounded-md border border-brand-dark/ px-3 py-1.5 text-sm text-brand-dark hover:bg-brand/15 disabled:opacity-50"
+                        className="rounded-md border border-brand-dark/60 px-3 py-1.5 text-sm text-brand-dark hover:bg-brand/15 disabled:opacity-50"
                       >
                         Apply
                       </button>
@@ -373,7 +399,7 @@ function TicketsPageInner() {
                       <button
                         onClick={bulkAssign}
                         disabled={busy}
-                        className="rounded-md border border-brand-dark/ px-3 py-1.5 text-sm text-brand-dark hover:bg-brand/15 disabled:opacity-50"
+                        className="rounded-md border border-brand-dark/60 px-3 py-1.5 text-sm text-brand-dark hover:bg-brand/15 disabled:opacity-50"
                       >
                         Assign
                       </button>
@@ -393,7 +419,7 @@ function TicketsPageInner() {
             </div>
           )}
 
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-2">
             {rows.map((t) => {
               const sla = slaInfo((t as any).due_at, t.status);
               return (
@@ -409,21 +435,20 @@ function TicketsPageInner() {
                   )}
                   <Link
                     href={`/tickets/${t.id}`}
-                    className={`block flex-1 min-w-0 rounded-xl border bg-surface backdrop-blur p-4 transition-all hover:border-brand-dark/ hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-dark/15 ${
-                      selected.has(t.id) ? 'border-brand-dark/' : 'border-line'
+                    className={`block flex-1 min-w-0 rounded-xl border bg-surface backdrop-blur px-4 py-3 transition-all hover:border-brand-dark/60 hover:shadow-lg hover:shadow-brand-dark/15 ${
+                      selected.has(t.id) ? 'border-brand-dark/60' : 'border-line'
                     }`}
                   >
+                    {/* one line per ticket, so more of them fit on the screen */}
                     <div className="flex items-center justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="font-medium truncate">
-                          {t.subject}{' '}
-                          <span className="text-muted font-normal">#{t.id}</span>
-                        </p>
-                        <p className={`text-sm mt-1 capitalize ${statusStyles[t.status] ?? 'text-muted'}`}>
+                      <p className="min-w-0 truncate font-medium">
+                        {t.subject}{' '}
+                        <span className="text-muted font-normal">#{t.id}</span>
+                      </p>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className={`hidden text-sm capitalize sm:inline ${statusStyles[t.status] ?? 'text-muted'}`}>
                           {t.status.replace('_', ' ')}
-                        </p>
-                      </div>
-                      <div className="flex shrink-0 flex-col items-end gap-1.5">
+                        </span>
                         <span
                           className={`text-xs font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border capitalize ${
                             priorityStyles[t.priority] ?? 'bg-navy/5 text-muted border-navy/20'
@@ -443,14 +468,17 @@ function TicketsPageInner() {
               );
             })}
           </ul>
-          <Pager
-            page={state.data.page}
-            pageSize={state.data.pageSize}
-            total={state.data.total}
-            onPageChange={(p) => updateParam('page', String(p))}
-          />
+          <div className="mt-auto">
+            <Pager
+              page={state.data.page}
+              pageSize={state.data.pageSize}
+              total={state.data.total}
+              onPageChange={(p) => updateParam('page', String(p))}
+            />
+          </div>
         </>
       )}
+      </div>
     </div>
   );
 }

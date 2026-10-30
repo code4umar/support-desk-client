@@ -22,16 +22,17 @@ const TYPE_LABEL: Record<string, string> = {
   user_login: 'Login',
   user_registered: 'New account',
   mention: 'Mention',
+  ticket_resolved: 'Fixed',
 };
 
-// Bell with an unread badge. Only admins receive notifications, so for every
-// other role this renders nothing. It checks the API every 20s while the tab is
+// Bell with an unread badge, for every signed-in user (customers get "your
+// issue was fixed" notices). It checks the API every 20s while the tab is
 // visible, and shows a toast when something new arrives.
 export default function NotificationBell() {
   const { user } = useAuth();
   const router = useRouter();
   const { show } = useToast();
-  const isAdmin = user?.role === 'admin' || user?.role === 'agent'; // agents get the mentions
+  const signedIn = !!user;
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Notif[]>([]);
@@ -62,7 +63,7 @@ export default function NotificationBell() {
   }, [show]);
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!signedIn) return;
     const first = setTimeout(load, 0);
     const tick = () => {
       if (!document.hidden) load();
@@ -74,7 +75,7 @@ export default function NotificationBell() {
       clearInterval(timer);
       document.removeEventListener('visibilitychange', tick);
     };
-  }, [isAdmin, load]);
+  }, [signedIn, load]);
 
   // close on outside click / Escape
   useEffect(() => {
@@ -93,7 +94,7 @@ export default function NotificationBell() {
     };
   }, [open]);
 
-  if (!isAdmin) return null;
+  if (!signedIn) return null;
 
   function openItem(n: Notif) {
     setOpen(false);

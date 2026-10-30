@@ -4,8 +4,14 @@ import { api } from '@/lib/api';
 import RequireAuth from '@/components/RequireAuth';
 import { useAuth } from '@/lib/auth-context';
 import {
-  ActivityList, AttentionList, GradientCard, HeroBanner, ReportsChart, SearchButton, StatusRing, type Ticket,
+  ActivityList, AttentionList, GradientCard, HeroBanner, ReportsChart, type Ticket,
 } from '@/components/dashboard/widgets';
+import {
+  CategoryMix, DeskPulse, HelpCenterImpact, KnownIssuesCard, ResolvedTile, SlaRadar, StatTile,
+} from '@/components/dashboard/insights';
+import ViewTabs from '@/components/ViewTabs';
+
+type DashView = 'overview' | 'workload' | 'insights';
 
 const PRIO_RANK: Record<string, number> = { urgent: 0, high: 1, normal: 2, low: 3 };
 
@@ -54,14 +60,11 @@ async function fetchTickets(): Promise<Ticket[]> {
 
 function Skeleton() {
   return (
-    <div className="grid animate-pulse gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="space-y-6">
-        <div className="h-16 w-72 rounded-xl bg-navy/5" />
-        <div className="h-40 rounded-2xl bg-navy/5" />
-        <div className="h-64 rounded-2xl bg-navy/5" />
-      </div>
-      <div className="space-y-6">
-        <div className="h-64 rounded-2xl bg-navy/5" />
+    <div className="animate-pulse space-y-5">
+      <div className="h-16 w-72 rounded-xl bg-navy/5" />
+      <div className="grid gap-5 lg:grid-cols-3">
+        <div className="h-72 rounded-2xl bg-navy/5" />
+        <div className="h-72 rounded-2xl bg-navy/5" />
         <div className="h-72 rounded-2xl bg-navy/5" />
       </div>
     </div>
@@ -73,6 +76,7 @@ function DashboardInner() {
   const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [error, setError] = useState('');
   const [now] = useState(() => Date.now());
+  const [view, setView] = useState<DashView>('overview');
 
   useEffect(() => {
     fetchTickets().then(setTickets).catch((e) => setError(e?.message ?? 'Failed to load tickets'));
@@ -80,7 +84,7 @@ function DashboardInner() {
 
   const stats = useMemo(() => {
     const list = tickets ?? [];
-    let open = 0, inProgress = 0, done = 0, overdue = 0, urgentOpen = 0, highInProgress = 0;
+    let open = 0, inProgress = 0, done = 0, overdue = 0, urgentOpen = 0, overdueInProgress = 0;
     const attention: (Ticket & { _overdue: boolean })[] = [];
     for (const t of list) {
       const active = t.status === 'open' || t.status === 'in_progress';
@@ -90,7 +94,7 @@ function DashboardInner() {
       const isOver = !!(active && t.due_at && new Date(t.due_at).getTime() < now);
       if (isOver) overdue++;
       if (t.status === 'open' && (t.priority === 'urgent' || t.priority === 'high')) urgentOpen++;
-      if (t.status === 'in_progress' && isOver) highInProgress++;
+      if (t.status === 'in_progress' && isOver) overdueInProgress++;
       if (active && (isOver || t.priority === 'urgent' || t.priority === 'high')) attention.push({ ...t, _overdue: isOver });
     }
     attention.sort((a, b) => {
@@ -99,9 +103,10 @@ function DashboardInner() {
       return pr !== 0 ? pr : b.id - a.id;
     });
     return {
-      open, inProgress, done, overdue, urgentOpen, highInProgress,
-      recent: [...list].sort((a, b) => b.id - a.id).slice(0, 4),
-      attention: attention.slice(0, 5), attentionTotal: attention.length,
+      open, inProgress, done, overdue, urgentOpen, overdueInProgress,
+      // lists trim these to however many rows fit on screen
+      recent: [...list].sort((a, b) => b.id - a.id).slice(0, 15),
+      attention: attention.slice(0, 15), attentionTotal: attention.length,
     };
   }, [tickets, now]);
 
@@ -109,35 +114,74 @@ function DashboardInner() {
   if (!tickets) return <Skeleton />;
 
   const first = (user?.name ?? '').trim().split(/\s+/)[0] || 'there';
+  const isStaff = user?.role === 'agent' || user?.role === 'admin';
+
+  // Each tab fills exactly one screen: a row of summary tiles (Overview) or a
+  // summary card on top, and cards below that stretch to the bottom. Lists
+  // show as many rows as fit, so nothing scrolls and nothing sits half-empty.
+  const tabs: { id: DashView; label: string; badge?: number }[] = isStaff
+    ? [
+        { id: 'overview', label: 'Overview' },
+        { id: 'workload', label: 'Workload', badge: stats.attentionTotal },
+        { id: 'insights', label: 'Insights' },
+      ]
+    : [
+        { id: 'overview', label: 'Overview' },
+        { id: 'insights', label: 'Activity', badge: stats.attentionTotal },
+      ];
+  const twoRows = 'grid gap-5 md:h-full md:grid-rows-[auto_minmax(0,1fr)]';
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-      <div className="min-w-0 space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-navy">Hello, {first}</h1>
-            <p className="mt-1 text-sm text-muted">Welcome back!</p>
-          </div>
-          <div className="hidden md:block xl:hidden"><SearchButton /></div>
+    <div className="flex flex-col gap-5 md:h-full md:min-h-0">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-3xl font-bold tracking-tight text-navy">Hello, {first}</h1>
+          <DeskPulse tickets={tickets} now={now} isStaff={isStaff} />
         </div>
-
-        <HeroBanner />
-
-        <div className="grid gap-6 lg:grid-cols-[1fr_1.05fr]">
-          <ActivityList tickets={stats.recent} />
-          <div className="space-y-4">
-            <GradientCard title="Open tickets" value={stats.open} footLabel="Urgent / high" footValue={stats.urgentOpen} from="#9af8f0" to="#1fe5d8" tone="light" href="/tickets?status=open" />
-            <GradientCard title="In progress" value={stats.inProgress} footLabel="Overdue" footValue={stats.overdue} from="#3a5da0" to="#1d3057" tone="dark" href="/tickets?status=in_progress" />
-          </div>
-        </div>
-
-        <AttentionList items={stats.attention} total={stats.attentionTotal} />
+        <ViewTabs label="Dashboard views" tabs={tabs} value={view} onChange={setView} />
       </div>
 
-      <aside className="space-y-6">
-        <ReportsChart tickets={tickets} />
-        <StatusRing open={stats.open} inProgress={stats.inProgress} done={stats.done} />
-      </aside>
+      <div className="md:min-h-0 md:flex-1">
+        {view === 'overview' && (
+          <div className={twoRows}>
+            <div className={`grid gap-4 sm:grid-cols-2 ${isStaff ? 'xl:grid-cols-4' : 'xl:grid-cols-3'}`}>
+              <GradientCard compact title="Open tickets" value={stats.open} footLabel="Urgent / high" footValue={stats.urgentOpen} from="#9af8f0" to="#1fe5d8" tone="light" href="/tickets?status=open" />
+              <GradientCard compact title="In progress" value={stats.inProgress} footLabel="Overdue" footValue={stats.overdueInProgress} from="#3a5da0" to="#1d3057" tone="dark" href="/tickets?status=in_progress" />
+              {isStaff && (
+                <StatTile alert label="Past SLA" value={stats.overdue} hint="open or in progress" href="/tickets?overdue=true&sortBy=dueAt&order=asc" />
+              )}
+              <ResolvedTile done={stats.done} total={tickets.length} />
+            </div>
+            <div className="grid gap-5 md:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+              <ActivityList tickets={stats.recent} />
+              {isStaff ? <ReportsChart tickets={tickets} /> : <HeroBanner className="md:h-full" />}
+            </div>
+          </div>
+        )}
+
+        {view === 'workload' && isStaff && (
+          <div className={twoRows}>
+            <SlaRadar tickets={tickets} now={now} />
+            <div className="grid gap-5 md:min-h-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+              <AttentionList items={stats.attention} total={stats.attentionTotal} />
+              <KnownIssuesCard tickets={tickets} />
+            </div>
+          </div>
+        )}
+
+        {view === 'insights' &&
+          (isStaff ? (
+            <div className={twoRows}>
+              <HelpCenterImpact />
+              <CategoryMix />
+            </div>
+          ) : (
+            <div className="grid gap-5 md:h-full lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+              <ReportsChart tickets={tickets} />
+              <AttentionList items={stats.attention} total={stats.attentionTotal} />
+            </div>
+          ))}
+      </div>
     </div>
   );
 }

@@ -53,6 +53,7 @@ export default function MobileNav({ name, role, onLogout }: { name: string; role
             <Link href="/tickets" className={item} onClick={() => setOpen(false)}>Tickets</Link>
             <Link href="/dashboard" className={item} onClick={() => setOpen(false)}>Dashboard</Link>
             <Link href="/tickets/new" className={item} onClick={() => setOpen(false)}>+ New ticket</Link>
+            <Link href="/help" className={item} onClick={() => setOpen(false)}>Help Center</Link>
             <Link href="/settings" className={item} onClick={() => setOpen(false)}>Settings</Link>
             {role === 'admin' && <Link href="/admin" className={item} onClick={() => setOpen(false)}>Admin</Link>}
           </nav>

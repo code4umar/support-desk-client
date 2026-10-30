@@ -39,8 +39,15 @@ describe('NotificationBell', () => {
     expect(await screen.findByText('2')).toBeInTheDocument();
   });
 
-  test('renders nothing (and never calls the API) for non-admins', () => {
+  test('customers get the bell too (for "your issue was fixed" notices)', async () => {
     mockRole = 'customer';
+    render(<NotificationBell />);
+    expect(await screen.findByRole('button', { name: /notifications/i })).toBeInTheDocument();
+    expect(api.getNotifications).toHaveBeenCalled();
+  });
+
+  test('renders nothing (and never calls the API) when signed out', () => {
+    mockRole = undefined;
     const { container } = render(<NotificationBell />);
     expect(container).toBeEmptyDOMElement();
     expect(api.getNotifications).not.toHaveBeenCalled();
