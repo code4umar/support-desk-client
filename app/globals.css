@@ -21,6 +21,12 @@
   --glass-border: #d3dbe2;
   --glass-hi: rgba(255,255,255,.9);
   --noise-opacity: .035;
+  /* SLA urgency (dashboard radar); each mode's trio checked for colour-blind separation */
+  --sla-breached: #e0294d;
+  --sla-soon: #d97a00;
+  --sla-today: #3d68e6;
+  --sla-later: #c3ccd6;
+  --kb-bar: #0fb5aa;
 }
 
 @theme inline {
@@ -129,6 +135,11 @@ select option { background-color: #fff; color: #213558; }
   --glass-border: rgba(255,255,255,.09);
   --glass-hi: rgba(255,255,255,.07);
   --noise-opacity: .07;
+  --sla-breached: #e5427a;
+  --sla-soon: #d4760a;
+  --sla-today: #4f7cff;
+  --sla-later: #3a4763;
+  --kb-bar: #2ee6d6;
 }
 
 /* status/priority colours: brighter on dark */

@@ -7,6 +7,7 @@ import NotificationBell from '@/components/NotificationBell';
 import ThemeToggle from '@/components/ThemeToggle';
 import MobileNav from '@/components/MobileNav';
 import { SearchButton } from '@/components/dashboard/widgets';
+import BrandMark from '@/components/BrandMark';
 
 function UserMenu() {
   const { user, logout } = useAuth();
@@ -73,11 +74,7 @@ export default function TopBar() {
   return (
     <div className="flex items-center justify-between gap-3 px-4 pb-2 pt-5 md:justify-end md:px-8">
       <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-[var(--accent-2)]">
-          <svg viewBox="0 0 24 24" className="h-4 w-4 text-on-brand" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </span>
+        <BrandMark size={32} />
         <span className="text-lg font-bold text-navy">Deskly</span>
       </Link>
       <div className="flex items-center gap-2 sm:gap-2.5">

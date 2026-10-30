@@ -2,6 +2,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import RequireAuth from '@/components/RequireAuth';
 import Avatar from '@/components/Avatar';
+import CategoryManager from '@/components/CategoryManager';
+import Pager from '@/components/Pager';
+
+type AdminTab = 'users' | 'activity' | 'categories';
+// sized so a page of each list fits on one laptop screen
+const USERS_PER_PAGE = 10;
+const ACTIVITY_PER_PAGE = 7;
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { api } from '@/lib/api';
@@ -29,6 +36,9 @@ const DOT: Record<string, string> = {
   profile_updated: 'bg-sky-400',
   user_registered: 'bg-green-400',
   login: 'bg-brand',
+  article_created: 'bg-indigo-400',
+  article_updated: 'bg-indigo-300',
+  article_deleted: 'bg-red-300',
 };
 
 function describe(a: Activity) {
@@ -39,6 +49,9 @@ function describe(a: Activity) {
     case 'profile_updated': return `${who} updated their profile`;
     case 'user_registered': return 'A new account was created';
     case 'login': return `${who} signed in`;
+    case 'article_created': return `${who} published a help article`;
+    case 'article_updated': return `${who} edited a help article`;
+    case 'article_deleted': return `${who} deleted a help article`;
     default: return `${who}: ${a.action.replace(/_/g, ' ')}`;
   }
 }
@@ -48,7 +61,8 @@ const messageOf = (e: unknown) => (e as { message?: string })?.message || 'Somet
 function AdminInner() {
   const { user } = useAuth();
   const { show } = useToast();
-  const [tab, setTab] = useState<'users' | 'activity'>('users');
+  const [tab, setTab] = useState<AdminTab>('users');
+  const [page, setPage] = useState(1);
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [activity, setActivity] = useState<Activity[] | null>(null);
   const [query, setQuery] = useState('');
@@ -113,41 +127,51 @@ function AdminInner() {
     }
   }
 
-  function openTab(next: 'users' | 'activity') {
+  function openTab(next: AdminTab) {
     setTab(next);
+    setPage(1);
     if (next === 'activity') loadActivity();
   }
 
   const tabClass = (t: string) =>
     `rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${tab === t ? 'bg-brand text-on-brand' : 'text-muted hover:text-navy'}`;
 
-  return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Admin</h1>
-        <p className="text-sm text-muted">Manage people and see what has been happening</p>
-      </div>
+  const usersPage = visible.slice((page - 1) * USERS_PER_PAGE, page * USERS_PER_PAGE);
+  const activityPage = (activity ?? []).slice((page - 1) * ACTIVITY_PER_PAGE, page * ACTIVITY_PER_PAGE);
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {([['Total users', counts.total], ['Admins', counts.admin], ['Agents', counts.agent], ['Customers', counts.customer]] as const).map(([label, n]) => (
-          <div key={label} className="rounded-xl border border-line bg-navy/[0.03] p-4">
-            <div className="text-xs uppercase tracking-wide text-muted">{label}</div>
-            <div className="mt-1 text-2xl font-bold text-navy">{users ? n : '–'}</div>
-          </div>
-        ))}
+  // One screen: header + counts, tabs, and a list that pages instead of scrolling.
+  return (
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 md:h-full md:min-h-0">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Admin</h1>
+          <p className="text-sm text-muted">Manage people and see what has been happening</p>
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          {([['Users', counts.total], ['Admins', counts.admin], ['Agents', counts.agent], ['Customers', counts.customer]] as const).map(([label, n]) => (
+            <div key={label} className="rounded-xl border border-line bg-navy/[0.03] px-3 py-2 text-center">
+              <div className="text-xl font-bold text-navy">{users ? n : '–'}</div>
+              <div className="text-[10px] uppercase tracking-wide text-muted">{label}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3">
         <div className="inline-flex rounded-lg border border-line bg-surface p-1">
           <button type="button" className={tabClass('users')} onClick={() => openTab('users')}>Users</button>
           <button type="button" className={tabClass('activity')} onClick={() => openTab('activity')}>Activity</button>
+          <button type="button" className={tabClass('categories')} onClick={() => openTab('categories')}>Categories</button>
         </div>
-        {tab === 'users' ? (
+        {tab === 'categories' ? null : tab === 'users' ? (
           <input
             aria-label="Search users"
             placeholder="Search name or email…"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(1);
+            }}
             className="w-56 rounded-md border border-line bg-transparent px-3 py-1.5 text-sm outline-none focus:border-brand-dark focus:ring-1 focus:ring-brand/50"
           />
         ) : (
@@ -158,14 +182,14 @@ function AdminInner() {
       {error && <p className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       {tab === 'users' && (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
-          {users === null && <li className="px-5 py-10 text-center text-sm text-muted">Loading…</li>}
-          {users !== null && visible.length === 0 && <li className="px-5 py-10 text-center text-sm text-muted">No users match your search</li>}
-          {visible.map((u) => {
+        <ul className="grid content-start gap-2 sm:grid-cols-2">
+          {users === null && <li className="col-span-full rounded-xl border border-line bg-surface px-5 py-10 text-center text-sm text-muted">Loading…</li>}
+          {users !== null && visible.length === 0 && <li className="col-span-full rounded-xl border border-line bg-surface px-5 py-10 text-center text-sm text-muted">No users match your search</li>}
+          {usersPage.map((u) => {
             const self = String(u.id) === String(user.id);
             return (
-              <li key={u.id} className="flex flex-wrap items-center gap-3 px-5 py-3.5">
-                <Avatar name={u.full_name} size={40} />
+              <li key={u.id} className="flex items-center gap-3 rounded-xl border border-line bg-surface px-4 py-2.5">
+                <Avatar name={u.full_name} size={34} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-navy">
                     {u.full_name} {self && <span className="text-xs font-normal text-muted">(you)</span>}
@@ -194,8 +218,8 @@ function AdminInner() {
         <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-surface">
           {activity === null && <li className="px-5 py-10 text-center text-sm text-muted">Loading…</li>}
           {activity !== null && activity.length === 0 && <li className="px-5 py-10 text-center text-sm text-muted">Nothing has happened yet</li>}
-          {(activity ?? []).map((a) => (
-            <li key={a.id} className="flex items-start gap-3 px-5 py-3.5">
+          {activityPage.map((a) => (
+            <li key={a.id} className="flex items-start gap-3 px-5 py-3">
               <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${DOT[a.action] ?? 'bg-muted'}`} aria-hidden="true" />
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-navy">{describe(a)}</p>
@@ -205,6 +229,19 @@ function AdminInner() {
             </li>
           ))}
         </ul>
+      )}
+
+      {tab === 'categories' && <CategoryManager />}
+
+      {tab !== 'categories' && (
+        <div className="mt-auto [&>*]:mt-0">
+          <Pager
+            page={page}
+            pageSize={tab === 'users' ? USERS_PER_PAGE : ACTIVITY_PER_PAGE}
+            total={tab === 'users' ? visible.length : (activity ?? []).length}
+            onPageChange={setPage}
+          />
+        </div>
       )}
     </div>
   );
